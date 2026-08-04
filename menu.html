@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full Kitchen Menu | Feranoz Patisserie & Cafe</title>
+  <meta name="description" content="Explore the authentic menu at Feranoz Patisserie & Cafe — artisan pastries, 12-inch gourmet pizzas, high-protein wraps, single-origin coffee and desserts." />
+  <link rel="icon" href="images/logo.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Alex+Brush&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+
+  <style>
+    body { padding-top: calc(var(--nav-height) + 20px); }
+    
+    .menu-hero-banner {
+      padding: 40px 24px 20px;
+      text-align: center;
+    }
+
+    /* SLEEK FLOATING ROUNDED CAPSULE FOOD BUTTONS BAR */
+    .sticky-cat-nav {
+      position: sticky;
+      top: calc(var(--nav-height) + 14px);
+      z-index: 900;
+      padding: 6px 14px;
+      max-width: 1060px;
+      margin: 0 auto 30px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(28px) saturate(220%);
+      -webkit-backdrop-filter: blur(28px) saturate(220%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 14px 36px rgba(44, 24, 16, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .sticky-cat-inner {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      justify-content: center;
+      padding: 4px 6px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .sticky-cat-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu-cat-card {
+      background: #FFFFFF;
+      box-shadow: 0 10px 30px rgba(44, 24, 16, 0.06);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 40px;
+      border: 1px solid #EFEAE3;
+      scroll-margin-top: 170px;
+    }
+
+    .menu-cat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px dashed #E5DFD6;
+      padding-bottom: 12px;
+    }
+
+    .menu-cat-header h2 {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <img src="images/logo.png" alt="Feranoz Logo" class="logo-img" onerror="this.style.display='none';" />
+      <span class="brand-title-font">Feranoz</span>
+    </a>
+
+    <nav class="nav-links-middle" id="nav-menu">
+      <a href="index.html#hero">Home</a>
+      <a href="index.html#menu-preview">Menu</a>
+      <a href="index.html#gallery">Gallery</a>
+    </nav>
+
+    <div class="nav-right">
+      <button class="btn-primary" onclick="openOrderModal(); return false;">Order Now</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO BANNER -->
+<section class="menu-hero-banner">
+  <div class="container">
+    <span class="section-tag">Authentic Kitchen Menu</span>
+    <h1>Feranoz Full Menu</h1>
+    <p class="section-subtitle">Real kitchen items straight from Banjara Hills</p>
+  </div>
+</section>
+
+<!-- SLEEK FLOATING ROUNDED FOOD BUTTONS BAR -->
+<div class="sticky-cat-nav">
+  <div class="sticky-cat-inner" id="category-nav-links">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- FULL MENU SECTIONS -->
+<main class="container" style="padding-top: 10px; padding-bottom: 80px;">
+  <!-- Search Bar -->
+  <div style="margin-bottom: 30px; padding: 12px 18px; border-radius: 14px; background: #FFFFFF; border: 1px solid #EFEAE3; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+    <input type="text" id="menu-search-input" placeholder="Search gourmet pizza, croissants, cakes, cold coffee..." 
+           style="border: none; background: transparent; width: 100%; font-family: inherit; font-size: 0.95rem; color: var(--ink); outline: none;" 
+           oninput="handleMenuSearch(this.value)" />
+  </div>
+
+  <div id="full-menu-sections">
+    <!-- Populated dynamically -->
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-logo">Feranoz Patisserie &amp; Cafe</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="dashboard.html" target="_blank" rel="noopener">Owner Dashboard</a>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Feranoz Patisserie &amp; Cafe. All Rights Reserved.</div>
+  </div>
+</footer>
+
+<!-- ORDERING MODAL -->
+<div class="modal-overlay" id="order-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Feranoz Table Ordering System</h3>
+      <button class="modal-close-btn" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-left">
+        <div id="location-banner" class="checking">Verifying location…</div>
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">1. Select Table:</label>
+          <div class="table-grid" id="table-grid"></div>
+        </div>
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">2. Choose Items:</label>
+          <div class="category-tabs" id="category-tabs"></div>
+        </div>
+        <div>
+          <input type="text" id="menu-search" placeholder="Search menu items..." style="width:100%; padding:10px 14px; border-radius:12px; border:1px solid #EFEAE3; font-size:0.88rem; outline:none;" />
+        </div>
+        <div class="menu-items-container" id="menu-items-container"></div>
+      </div>
+      <div class="modal-right">
+        <div>
+          <div class="cart-title">
+            <span>Selected Cart (<span id="cart-count-badge">0</span>)</span>
+            <button onclick="clearCart()" style="font-size:0.75rem; color:#C62828; cursor:pointer;">Clear</button>
+          </div>
+          <div class="cart-items-list" id="cart-items-list"></div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+            <input type="text" id="customer-name" placeholder="Your Name (Optional)" style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none;" />
+            <textarea id="special-instructions" rows="2" placeholder="Special Instructions / Requests..." style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none; resize:none; font-family:inherit;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer-box">
+          <div class="total-row">
+            <span class="total-label">Total Amount</span>
+            <span class="total-amount" id="cart-total">₹0</span>
+          </div>
+          <button class="btn-place-order" id="btn-place-order" onclick="placeOrder()" disabled>Place Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="location-denied-overlay">
+  <div class="confirm-box loc-denied-box"></div>
+</div>
+
+<div class="modal-overlay" id="order-confirm-overlay"></div>
+
+<!-- Scripts -->
+<script src="js/menu-data.js"></script>
+<script src="js/ordering.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    renderFullMenuSections();
+    renderCategoryNavLinks();
+  });
+
+  function renderCategoryNavLinks() {
+    const nav = document.getElementById('category-nav-links');
+    if (!nav || typeof CATEGORIES === 'undefined') return;
+    nav.innerHTML = CATEGORIES.filter(c => c.id !== 'all').map((cat, idx) => `
+      <button onclick="scrollToCategory('${cat.id}', this)" class="cat-pill-btn ${idx === 0 ? 'active' : ''}">${cat.label}</button>
+    `).join('');
+  }
+
+  function scrollToCategory(catId, btnEl) {
+    const target = document.getElementById(`cat-section-${catId}`);
+    if (!target) return;
+    
+    // Smooth scroll position cleanly below the floating rounded buttons bar
+    const navHeight = document.getElementById('navbar')?.offsetHeight || 68;
+    const catNavHeight = document.querySelector('.sticky-cat-nav')?.offsetHeight || 54;
+    const totalOffset = navHeight + catNavHeight + 24;
+
+    const targetPos = target.getBoundingClientRect().top + window.pageYOffset - totalOffset;
+    window.scrollTo({ top: targetPos, behavior: 'smooth' });
+
+    document.querySelectorAll('.sticky-cat-inner .cat-pill-btn').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+  }
+
+  function renderFullMenuSections(query = '') {
+    const container = document.getElementById('full-menu-sections');
+    if (!container || typeof MENU_DATA === 'undefined') return;
+
+    let html = '';
+    CATEGORIES.filter(c => c.id !== 'all').forEach(cat => {
+      let items = MENU_DATA.filter(i => i.category === cat.id);
+      if (query.trim()) {
+        const q = query.toLowerCase();
+        items = items.filter(i => i.name.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+      }
+      if (items.length === 0) return;
+
+      html += `
+        <div class="menu-cat-card" id="cat-section-${cat.id}">
+          <div class="menu-cat-header">
+            <h2>${cat.label}</h2>
+          </div>
+          <div class="menu-preview-grid">
+            ${items.map(item => `
+              <div class="caffeine-item-card">
+                <div class="card-img-wrap">
+                  ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
+                  ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
+                </div>
+                <div>
+                  <div class="card-title-row">
+                    <h3 class="card-title">${item.name}</h3>
+                    <span class="card-price">₹${item.price}</span>
+                  </div>
+                  <p class="card-desc">${item.description}</p>
+                </div>
+                <button class="card-action-btn" onclick="openOrderModal()">Order Item</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    });
+
+    if (!html) html = `<div style="text-align:center; padding:60px; color:var(--ink-soft);">No items match "${query}".</div>`;
+    container.innerHTML = html;
+  }
+
+  function handleMenuSearch(val) {
+    renderFullMenuSections(val);
+  }
+</script>
+</body>
+</html>

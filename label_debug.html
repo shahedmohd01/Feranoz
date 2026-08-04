@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Label Debugger</title>
+<style>
+  body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .card { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+  img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-top: 5px; }
+</style>
+</head>
+<body>
+<h1>Label Debugger - Find Correct Frames</h1>
+<div class="grid">
+
+  <div class="card">
+    <strong>label_frame_001_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_001_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_001_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_001_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_002_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_002_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_002_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_002_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_003_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_003_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_003_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_003_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_003_col_2.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_003_col_2.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_003_col_3.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_003_col_3.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_004_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_004_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_004_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_004_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_004_col_2.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_004_col_2.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_004_col_3.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_004_col_3.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_005_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_005_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_005_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_005_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_005_col_2.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_005_col_2.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_005_col_3.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_005_col_3.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_006_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_006_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_006_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_006_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_007_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_007_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_007_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_007_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_007_col_2.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_007_col_2.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_007_col_3.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_007_col_3.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_008_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_008_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_008_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_008_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_009_col_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_009_col_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_009_col_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_009_col_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_009_col_2.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_009_col_2.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_010_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_010_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_010_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_010_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_011_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_011_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_011_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_011_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_012_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_012_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_013_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_013_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_014_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_014_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_015_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_015_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_016_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_016_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_017_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_017_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_017_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_017_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_018_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_018_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_019_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_019_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_020_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_020_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_021_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_021_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_022_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_022_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_023_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_023_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_024_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_024_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_025_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_025_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_026_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_026_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_027_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_027_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_027_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_027_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_028_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_028_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_029_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_029_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_030_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_030_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_031_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_031_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_032_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_032_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_033_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_033_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_034_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_034_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_035_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_035_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_036_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_036_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_037_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_037_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_038_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_038_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_039_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_039_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_040_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_040_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_041_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_041_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_042_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_042_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_042_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_042_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_043_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_043_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_043_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_043_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_044_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_044_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_045_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_045_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_046_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_046_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_047_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_047_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_048_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_048_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_049_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_049_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_050_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_050_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_051_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_051_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_052_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_052_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_053_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_053_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_054_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_054_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_055_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_055_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_056_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_056_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_057_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_057_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_058_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_058_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_059_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_059_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_059_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_059_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_060_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_060_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_061_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_061_full_0.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_061_full_1.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_061_full_1.jpg" />
+  </div>
+
+  <div class="card">
+    <strong>label_frame_062_full_0.jpg</strong>
+    <br>
+    <img src="images/debug_labels/label_frame_062_full_0.jpg" />
+  </div>
+
+</div>
+</body>
+</html>
