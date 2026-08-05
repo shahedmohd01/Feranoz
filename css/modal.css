@@ -460,7 +460,7 @@
 }
 
 /* ── Mobile Responsive Table Ordering System ──────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .modal-overlay {
     width: 100vw;
     max-width: 100vw;
@@ -684,6 +684,11 @@
     max-height: none;
     box-sizing: border-box;
     overflow-x: hidden;
+  }
+
+  .cart-items-list {
+    max-height: none !important;
+    overflow-y: visible !important;
   }
 
   .confirm-box {

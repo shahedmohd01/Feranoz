@@ -412,7 +412,7 @@ function resetTableSelectionMobile() {
 }
 
 function updateMobileOrderFlow() {
-  const isMobile = window.innerWidth <= 768;
+  const isMobile = window.innerWidth <= 1024;
   const modalLeft = document.querySelector('.modal-left');
   const step1Box = document.getElementById('step-1-table-box');
   const step2Box = document.getElementById('step-2-menu-box');
@@ -435,7 +435,7 @@ function updateMobileOrderFlow() {
     return;
   }
 
-  // Mobile 3-Step View
+  // Mobile 3-Step View (up to 1024px screen width)
   if (mobileOrderStep === 1 || !selectedTable) {
     // Step 1: Table Selection
     mobileOrderStep = 1;
@@ -458,18 +458,21 @@ function updateMobileOrderFlow() {
     if (backBtn) backBtn.innerHTML = '← Change Table';
     if (stepTitle) stepTitle.textContent = 'Step 2: Choose Dishes';
   } else if (mobileOrderStep === 3) {
-    // Step 3: Final Order Place & Checkout (Hide modalLeft completely to bring checkout to top)
+    // Step 3: Final Order Place & Checkout (Hide modalLeft completely so checkout renders at top)
     if (modalLeft) modalLeft.style.display = 'none';
     if (step1Box) step1Box.style.display = 'none';
     if (step2Box) step2Box.style.display = 'none';
-    if (step3Box) step3Box.style.display = 'flex';
+    if (step3Box) {
+      step3Box.style.display = 'flex';
+      step3Box.style.width = '100%';
+    }
     if (backBtn) backBtn.innerHTML = '← Add More Items';
     if (stepTitle) stepTitle.textContent = `Step 3: Table ${selectedTable} Checkout`;
   }
 }
 
 function handleModalBackStep() {
-  const isMobile = window.innerWidth <= 768;
+  const isMobile = window.innerWidth <= 1024;
   if (!isMobile || mobileOrderStep === 1) {
     closeOrderModal();
   } else if (mobileOrderStep === 2) {
