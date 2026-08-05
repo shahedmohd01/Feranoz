@@ -66,8 +66,8 @@ function initScrollReveal() {
       }
     });
   }, {
-    threshold: 0.01,
-    rootMargin: '0px 0px -10px 0px'
+    threshold: 0.12,
+    rootMargin: '-30px 0px -30px 0px'
   });
 
   revealElements.forEach(el => observer.observe(el));

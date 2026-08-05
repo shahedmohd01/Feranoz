@@ -91,8 +91,8 @@ button {
 /* ── SCROLL-DRIVEN FADE IN / FADE OUT REVEAL ANIMATIONS ─────── */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(15px);
-  transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: translateY(30px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -787,10 +787,6 @@ h3 {
 /* Scoped Item Image Alignment (Item-Specific or Category-Scoped to prevent cross-category collision) */
 .card-img-wrap img[data-name="Crunchy Chicken Burger"] {
   object-position: center 76%;
-}
-
-.card-img-wrap img[data-name*="Blueberry"] {
-  object-position: top center;
 }
 
 /* Category-specific 10th item alignments (Example: Juices/Quenchers section only) */

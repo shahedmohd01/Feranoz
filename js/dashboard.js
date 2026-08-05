@@ -312,3 +312,43 @@ function printReceipt(orderId) {
     </html>
   `);
 }
+
+// ── Inline Owner View Switcher ────────────────────────────────
+function showDashboardView(view) {
+  const ordersSec = document.getElementById('view-orders-section');
+  const menuSec = document.getElementById('view-menu-section');
+  if (!ordersSec || !menuSec) return;
+
+  if (view === 'menu') {
+    ordersSec.style.display = 'none';
+    menuSec.style.display = 'block';
+    renderOwnerMenuManagement();
+  } else {
+    menuSec.style.display = 'none';
+    ordersSec.style.display = 'block';
+  }
+}
+
+function renderOwnerMenuManagement() {
+  const container = document.getElementById('owner-menu-grid');
+  if (!container || typeof MENU_DATA === 'undefined') return;
+
+  container.innerHTML = MENU_DATA.map(item => `
+    <div style="background:#FFFFFF; border:1px solid #EFEAE3; border-radius:16px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div style="width:54px; height:54px; border-radius:12px; overflow:hidden; background:#FAF7F2; flex-shrink:0;">
+          ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" />` : ''}
+        </div>
+        <div>
+          <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--gold); text-transform:uppercase;">${item.category}</span>
+          <div style="font-family:var(--font-serif); font-size:0.95rem; font-weight:700; color:var(--ink);">${item.name}</div>
+          <span style="font-family:var(--font-mono); font-size:0.88rem; font-weight:700; color:#6B3A2A;">₹${item.price}</span>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:8px;">
+        <span style="font-size:0.78rem; font-weight:600; color:${item.isVeg ? '#2E7D32' : '#C62828'};">${item.isVeg ? '● Veg' : '▲ Non-Veg'}</span>
+        <button style="padding:4px 12px; border-radius:9999px; background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9; font-size:0.76rem; font-weight:700; cursor:pointer;">Available</button>
+      </div>
+    </div>
+  `).join('');
+}

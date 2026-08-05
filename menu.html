@@ -108,6 +108,7 @@
     </nav>
 
     <div class="nav-right">
+      <a href="index.html" class="btn-outline" style="font-size: 0.8rem; padding: 6px 14px; border-radius: 9999px; text-decoration: none;">← Back Home</a>
       <button class="btn-primary" onclick="openOrderModal(); return false;">Order Now</button>
     </div>
   </div>
@@ -116,6 +117,9 @@
 <!-- HERO BANNER -->
 <section class="menu-hero-banner">
   <div class="container">
+    <a href="index.html" style="display:inline-flex; align-items:center; gap:6px; color:var(--ink-soft); font-family:var(--font-mono); font-size:0.82rem; font-weight:700; text-decoration:none; margin-bottom:14px; background:#FFFFFF; padding:6px 16px; border-radius:9999px; border:1px solid #EFEAE3; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      ← Back to Main Interface
+    </a>
     <span class="section-tag">Authentic Kitchen Menu</span>
     <h1>Feranoz Full Menu</h1>
     <p class="section-subtitle">Real kitchen items straight from Banjara Hills</p>
@@ -216,11 +220,50 @@
 <script src="js/ordering.js"></script>
 <script src="js/main.js"></script>
 <script>
+  let isManualClick = false;
+
   document.addEventListener('DOMContentLoaded', () => {
     renderFullMenuSections();
     renderCategoryNavLinks();
     initCatNavMouseSwipe();
+    initMenuScrollSpy();
   });
+
+  function initMenuScrollSpy() {
+    window.addEventListener('scroll', () => {
+      if (isManualClick) return;
+
+      const sections = document.querySelectorAll('.menu-cat-card');
+      if (!sections.length) return;
+
+      const navHeight = document.getElementById('navbar')?.offsetHeight || 68;
+      const catNavHeight = document.querySelector('.sticky-cat-nav')?.offsetHeight || 54;
+      const offset = navHeight + catNavHeight + 80;
+
+      let currentCatId = '';
+      sections.forEach(sec => {
+        const top = sec.offsetTop - offset;
+        const bottom = top + sec.offsetHeight;
+        if (window.scrollY >= top && window.scrollY < bottom) {
+          currentCatId = sec.id.replace('cat-section-', '');
+        }
+      });
+
+      if (currentCatId) {
+        const buttons = document.querySelectorAll('.sticky-cat-inner .cat-pill-btn');
+        buttons.forEach(btn => {
+          const onclickAttr = btn.getAttribute('onclick') || '';
+          if (onclickAttr.includes(`'${currentCatId}'`)) {
+            if (!btn.classList.contains('active')) {
+              buttons.forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+          }
+        });
+      }
+    });
+  }
 
   function initCatNavMouseSwipe() {
     const nav = document.getElementById('category-nav-links');
@@ -285,6 +328,9 @@
   }
 
   function scrollToCategory(catId, btnEl) {
+    isManualClick = true;
+    setTimeout(() => { isManualClick = false; }, 800);
+
     const target = document.getElementById(`cat-section-${catId}`);
     if (!target) return;
     
