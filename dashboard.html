@@ -303,116 +303,136 @@
       .nav-hamburger.active span:nth-child(1) {
         transform: translateY(7px) rotate(45deg);
       }
+
       .nav-hamburger.active span:nth-child(2) {
         opacity: 0;
       }
+
       .nav-hamburger.active span:nth-child(3) {
         transform: translateY(-7px) rotate(-45deg);
       }
     }
 
-      .container {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-      }
+    .container {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+    }
 
-      .dash-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
+    .dash-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
 
-      .dash-header>div:last-child {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
+    .dash-header>div:last-child {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
-      .dash-header button {
-        flex: 1 1 auto;
-        font-size: 0.8rem !important;
-        padding: 8px 12px !important;
-        text-align: center;
-      }
+    .dash-header button {
+      flex: 1 1 auto;
+      font-size: 0.8rem !important;
+      padding: 8px 12px !important;
+      text-align: center;
+    }
 
-      .dash-stats-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 10px !important;
-      }
+    .dash-stats-grid {
+      grid-template-columns: 1fr 1fr !important;
+      gap: 10px !important;
+    }
 
-      .dash-stat-card {
-        padding: 14px !important;
-      }
+    .dash-stat-card {
+      padding: 14px !important;
+    }
 
-      .stat-val {
-        font-size: 1.6rem !important;
-      }
+    .stat-val {
+      font-size: 1.6rem !important;
+    }
 
-      .dash-controls-bar {
-        border-radius: 18px !important;
-        padding: 10px 14px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 10px !important;
-      }
+    .dash-controls-bar {
+      border-radius: 18px !important;
+      padding: 10px 14px !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+    }
 
-      #owner-menu-search {
-        max-width: 100% !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-      }
+    #owner-menu-search {
+      max-width: 100% !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
 
-      .orders-grid,
-      #owner-menu-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-      }
+    .orders-grid,
+    #owner-menu-grid {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
 
-      #footer {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-top: 40px !important;
-        margin-bottom: 0 !important;
-        padding: 28px 0 24px 0 !important;
-        box-sizing: border-box !important;
-      }
+    #footer {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-top: 40px !important;
+      margin-bottom: 0 !important;
+      padding: 28px 0 24px 0 !important;
+      box-sizing: border-box !important;
+    }
 
-      #footer .container {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-      }
+    #footer .container {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+    }
 
-      .footer-top {
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        width: 100% !important;
-        gap: 10px !important;
-      }
+    .footer-top {
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      width: 100% !important;
+      gap: 10px !important;
+    }
 
-      .footer-logo {
-        font-size: 1.3rem !important;
-        text-align: center !important;
-        width: 100% !important;
-      }
+    .footer-logo {
+      font-size: 1.7rem !important;
+      text-align: center !important;
+      width: 100% !important;
+    }
 
-      .footer-links {
-        justify-content: center !important;
-        width: 100% !important;
-      }
+    .footer-links {
+      justify-content: center !important;
+      width: 100% !important;
+    }
 
-      .footer-bottom {
-        text-align: center !important;
-        width: 100% !important;
-        margin-top: 12px !important;
-        font-size: 0.72rem !important;
+    .footer-bottom {
+      text-align: center !important;
+      width: 100% !important;
+      margin-top: 12px !important;
+      font-size: 0.72rem !important;
+    }
+
+    /* Prominent Owner Dashboard Footer Title */
+    .footer-logo {
+      font-family: var(--font-serif) !important;
+      font-size: 2.2rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.02em !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Desktop Owner Menu Management 4-Column Grid */
+    @media (min-width: 1024px) {
+      #owner-menu-grid,
+      .menu-management-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 16px !important;
       }
     }
 
@@ -654,7 +674,8 @@
           <span class="live-dot"></span> LIVE SYNC
         </span>
 
-        <button class="nav-hamburger" id="owner-hamburger" aria-label="Toggle owner navigation" onclick="toggleOwnerMobileNav()">
+        <button class="nav-hamburger" id="owner-hamburger" aria-label="Toggle owner navigation"
+          onclick="toggleOwnerMobileNav()">
           <span></span><span></span><span></span>
         </button>
       </div>

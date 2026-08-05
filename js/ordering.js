@@ -8,6 +8,8 @@ let locationStatus = 'idle';
 let userDistMeters = null;
 let preSelectedTable = null;
 
+let mobileOrderStep = 1; // 1 = Table selection, 2 = Menu list
+
 // ── Open / Close Modal ────────────────────────────────────────
 function openOrderModal(preTable) {
   if (preTable) preSelectedTable = preTable;
@@ -25,9 +27,15 @@ function openOrderModal(preTable) {
 
   if (preSelectedTable) {
     selectTable(preSelectedTable);
+    mobileOrderStep = 2;
+  } else if (selectedTable) {
+    mobileOrderStep = 2;
+  } else {
+    mobileOrderStep = 1;
   }
 
   checkLocation();
+  updateMobileOrderFlow();
 }
 
 function closeOrderModal() {
@@ -373,11 +381,59 @@ function renderTableGrid() {
 
 function selectTable(num) {
   selectedTable = num;
+  mobileOrderStep = 2; // Automatically proceed to Step 2 when table is selected on mobile
   document.querySelectorAll('.table-btn').forEach((btn, i) => {
     btn.classList.toggle('selected', i + 1 === num);
   });
   updatePlaceOrderBtn();
+  updateMobileOrderFlow();
 }
+
+function resetTableSelectionMobile() {
+  selectedTable = null;
+  mobileOrderStep = 1;
+  document.querySelectorAll('.table-btn').forEach(btn => btn.classList.remove('selected'));
+  updatePlaceOrderBtn();
+  updateMobileOrderFlow();
+}
+
+function updateMobileOrderFlow() {
+  const isMobile = window.innerWidth <= 768;
+  const step1Box = document.getElementById('step-1-table-box');
+  const step2Box = document.getElementById('step-2-menu-box');
+  const modalRight = document.querySelector('.modal-right');
+  const changeTableBtn = document.getElementById('btn-change-table');
+  const step1Label = document.getElementById('step-1-label');
+
+  if (!isMobile) {
+    // Desktop View: Show both steps and cart simultaneously
+    if (step1Box) step1Box.style.display = 'block';
+    if (step2Box) step2Box.style.display = 'block';
+    if (modalRight) modalRight.style.display = 'flex';
+    if (changeTableBtn) changeTableBtn.style.display = 'none';
+    if (step1Label) step1Label.textContent = '1. Select Your Table Number:';
+    return;
+  }
+
+  // Mobile View
+  if (mobileOrderStep === 1 && !selectedTable) {
+    // Step 1: Only show Table Selection Grid
+    if (step1Box) step1Box.style.display = 'block';
+    if (step2Box) step2Box.style.display = 'none';
+    if (modalRight) modalRight.style.display = 'none';
+    if (changeTableBtn) changeTableBtn.style.display = 'none';
+    if (step1Label) step1Label.textContent = '1. Select Your Table Number to Start:';
+  } else {
+    // Step 2: Show Menu List & Cart
+    if (step1Box) step1Box.style.display = 'block';
+    if (step2Box) step2Box.style.display = 'block';
+    if (modalRight) modalRight.style.display = 'flex';
+    if (changeTableBtn) changeTableBtn.style.display = 'inline-block';
+    if (step1Label) step1Label.textContent = `✓ Table ${selectedTable} Selected`;
+  }
+}
+
+window.addEventListener('resize', updateMobileOrderFlow);
 
 // ── Place Order Button State ───────────────────────────────────
 function updatePlaceOrderBtn() {

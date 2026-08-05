@@ -342,28 +342,38 @@
 
         <div class="modal-left">
 
-          <div>
-            <label
-              style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">
-              1. Select Your Table Number:
-            </label>
+          <!-- STEP 1: TABLE SELECTION -->
+          <div id="step-1-table-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label id="step-1-label"
+                style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block;">
+                1. Select Your Table Number:
+              </label>
+              <button id="btn-change-table" onclick="resetTableSelectionMobile()" style="display:none; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:#C9A84C; background:none; border:none; cursor:pointer; text-decoration:underline;">
+                Change Table
+              </button>
+            </div>
             <div class="table-grid" id="table-grid"></div>
           </div>
 
-          <div>
-            <label
-              style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">
-              2. Choose Items to Order:
-            </label>
-            <div class="category-tabs" id="category-tabs"></div>
+          <!-- STEP 2: MENU LIST & SEARCH -->
+          <div id="step-2-menu-box">
+            <div style="margin-top:12px;">
+              <label
+                style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">
+                2. Choose Items to Order:
+              </label>
+              <div class="category-tabs" id="category-tabs"></div>
+            </div>
+
+            <div style="margin-top:10px;">
+              <input type="text" id="menu-search" placeholder="Search menu items..."
+                style="width:100%; padding:10px 14px; border-radius:12px; border:1px solid #EFEAE3; font-family:inherit; font-size:0.88rem; outline:none; background:#FFFFFF;" />
+            </div>
+
+            <div class="menu-items-container" id="menu-items-container" style="margin-top:10px;"></div>
           </div>
 
-          <div>
-            <input type="text" id="menu-search" placeholder="Search menu items..."
-              style="width:100%; padding:10px 14px; border-radius:12px; border:1px solid #EFEAE3; font-family:inherit; font-size:0.88rem; outline:none; background:#FFFFFF;" />
-          </div>
-
-          <div class="menu-items-container" id="menu-items-container"></div>
         </div>
 
         <div class="modal-right">
