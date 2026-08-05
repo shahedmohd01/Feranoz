@@ -568,6 +568,28 @@ h3 {
   z-index: 9;
 }
 
+.card-avail-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  top: auto;
+  left: auto;
+  background: #2E7D32;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  z-index: 9;
+}
+
+.card-avail-badge.unavail {
+  background: #C62828;
+}
+
 /* 3D Stage Positions */
 .showcase-3d-item.active {
   transform: translate3d(-50%, -46%, 0) scale(1.12);
@@ -1173,6 +1195,43 @@ h3 {
     grid-template-columns: 1fr;
     padding: 24px;
     gap: 20px;
+  }
+
+  #footer {
+    text-align: center;
+    padding: 36px 16px 24px 16px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .footer-logo {
+    text-align: center;
+    font-size: 2.1rem !important;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px 20px;
+    width: 100%;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    width: 100%;
+    margin-top: 16px;
+    font-size: 0.74rem;
   }
 }
 

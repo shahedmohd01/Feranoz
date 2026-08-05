@@ -236,7 +236,8 @@ function renderMenuPreview(category = 'all') {
         <div class="card-img-wrap" style="${!isAvailable ? 'filter: grayscale(80%); opacity:0.8;' : ''}">
           <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
           ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
-          ${!isAvailable ? `<span class="card-bestseller-badge" style="background:#C62828;">UNAVAILABLE</span>` : (item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : `<span class="card-bestseller-badge" style="background:#2E7D32;">AVAILABLE</span>`)}
+          ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
+          <span class="card-avail-badge ${!isAvailable ? 'unavail' : ''}">${isAvailable ? 'AVAILABLE' : 'UNAVAILABLE'}</span>
         </div>
 
         <div>

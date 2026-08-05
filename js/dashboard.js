@@ -410,7 +410,7 @@ function renderOwnerMenuManagement() {
           </div>
         </div>
 
-        <!-- CONTROLS ROW: PRICE EDIT, AVAILABILITY TOGGLE & DELETE -->
+        <!-- CONTROLS ROW: PRICE EDIT, AVAILABILITY TOGGLE, EDIT & DELETE -->
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:10px; gap:6px; flex-wrap:wrap;">
           <div style="display:flex; align-items:center; gap:3px; font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#6B3A2A;">
             <span>₹</span>
@@ -418,10 +418,15 @@ function renderOwnerMenuManagement() {
                    style="width:68px; padding:3px 5px; border:1px solid #EFEAE3; border-radius:6px; font-family:var(--font-mono); font-weight:700; font-size:0.85rem; color:#6B3A2A; outline:none; background:#FAF7F2;" />
           </div>
 
-          <div style="display:flex; gap:6px; align-items:center;">
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
             <button onclick="toggleItemAvailability(${item.id})" 
                     style="padding:5px 12px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
               ${isAvailable ? '✓ Available' : '✕ Unavailable'}
+            </button>
+
+            <button onclick="openEditItemModal(${item.id})" title="Edit full details & Bestseller tag"
+                    style="padding:5px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; background:#E3F2FD; color:#1565C0; border:1px solid #BBDEFB; cursor:pointer; transition:all 0.2s ease;">
+              ✏️ Edit
             </button>
 
             <button onclick="deleteMenuItem(${item.id})" title="Delete item"
@@ -543,5 +548,87 @@ function submitNewMenuItem(event) {
     reader.readAsDataURL(fileEl.files[0]);
   } else {
     commitNewItem('');
+  }
+}
+
+// ── Edit Item Modal Actions ───────────────────────────────────
+function openEditItemModal(itemId) {
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const item = allItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  const idEl      = document.getElementById('edit-item-id');
+  const nameEl    = document.getElementById('edit-item-name');
+  const catEl     = document.getElementById('edit-item-category');
+  const priceEl   = document.getElementById('edit-item-price');
+  const isVegEl   = document.getElementById('edit-item-isveg');
+  const popEl     = document.getElementById('edit-item-popular');
+  const availEl   = document.getElementById('edit-item-available');
+  const descEl    = document.getElementById('edit-item-desc');
+  const fileEl    = document.getElementById('edit-item-image-file');
+
+  if (idEl) idEl.value = item.id;
+  if (nameEl) nameEl.value = item.name;
+  if (catEl) catEl.value = item.category;
+  if (priceEl) priceEl.value = item.price;
+  if (isVegEl) isVegEl.value = item.isVeg ? 'true' : 'false';
+  if (popEl) popEl.value = item.popular ? 'true' : 'false';
+  if (availEl) availEl.value = item.available !== false ? 'true' : 'false';
+  if (descEl) descEl.value = item.description || '';
+  if (fileEl) fileEl.value = '';
+
+  const overlay = document.getElementById('edit-item-modal-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function closeEditItemModal() {
+  const overlay = document.getElementById('edit-item-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function submitEditMenuItem(event) {
+  if (event) event.preventDefault();
+
+  const idEl      = document.getElementById('edit-item-id');
+  const nameEl    = document.getElementById('edit-item-name');
+  const catEl     = document.getElementById('edit-item-category');
+  const priceEl   = document.getElementById('edit-item-price');
+  const isVegEl   = document.getElementById('edit-item-isveg');
+  const popEl     = document.getElementById('edit-item-popular');
+  const availEl   = document.getElementById('edit-item-available');
+  const descEl    = document.getElementById('edit-item-desc');
+  const fileEl    = document.getElementById('edit-item-image-file');
+
+  if (!idEl || !idEl.value) return;
+
+  const itemId = parseInt(idEl.value, 10);
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const target = allItems.find(i => i.id === itemId);
+  if (!target) return;
+
+  function commitEdit(imageDataUrl) {
+    if (nameEl) target.name = nameEl.value.trim();
+    if (catEl) target.category = catEl.value;
+    if (priceEl) target.price = parseInt(priceEl.value, 10) || target.price;
+    if (isVegEl) target.isVeg = isVegEl.value === 'true';
+    if (popEl) target.popular = popEl.value === 'true';
+    if (availEl) target.available = availEl.value === 'true';
+    if (descEl) target.description = descEl.value.trim();
+    if (imageDataUrl) target.image = imageDataUrl;
+
+    saveActiveMenuData(allItems);
+    closeEditItemModal();
+    renderOwnerMenuCatTabs();
+    renderOwnerMenuManagement();
+  }
+
+  if (fileEl && fileEl.files && fileEl.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      commitEdit(e.target.result);
+    };
+    reader.readAsDataURL(fileEl.files[0]);
+  } else {
+    commitEdit(null);
   }
 }
