@@ -784,6 +784,20 @@ h3 {
   display: block;
 }
 
+/* Scoped Item Image Alignment (Item-Specific or Category-Scoped to prevent cross-category collision) */
+.card-img-wrap img[data-name="Crunchy Chicken Burger"] {
+  object-position: center 76%;
+}
+
+.card-img-wrap img[data-name*="Blueberry"] {
+  object-position: top center;
+}
+
+/* Category-specific 10th item alignments (Example: Juices/Quenchers section only) */
+#cat-section-quenchers .caffeine-item-card:nth-child(10) .card-img-wrap img {
+  object-position: center center;
+}
+
 .card-title-row {
   display: flex;
   justify-content: space-between;

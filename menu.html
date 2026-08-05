@@ -323,10 +323,10 @@
           </div>
           <div class="menu-preview-grid">
             ${items.map(item => `
-              <div class="caffeine-item-card">
+              <div class="caffeine-item-card" data-category="${item.category}" data-id="${item.id}">
                 <div class="card-img-wrap">
                   <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
-                  ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
+                  ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
                   ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
                 </div>
                 <div>
