@@ -148,7 +148,7 @@ function init3DShowcase() {
 
   initTouchAndHoverEvents();
   update3DStage();
-  startAutoSlide();
+  // Auto-slide disabled: Manual navigation via buttons, dots, or swipe only
 }
 
 function handle3DCardClick(idx) {
@@ -261,9 +261,7 @@ function update3DStage() {
 
 function startAutoSlide() {
   stopAutoSlide();
-  autoSlideTimer = setInterval(() => {
-    next3DSlide();
-  }, 4000);
+  // Auto-rotation disabled per user request
 }
 
 function stopAutoSlide() {
@@ -278,12 +276,8 @@ function initTouchAndHoverEvents() {
   if (!stage || stage.dataset.eventsInitialized) return;
   stage.dataset.eventsInitialized = 'true';
 
-  stage.addEventListener('mouseenter', stopAutoSlide);
-  stage.addEventListener('mouseleave', startAutoSlide);
-
   stage.addEventListener('touchstart', e => {
     touchStartX = e.changedTouches[0].screenX;
-    stopAutoSlide();
   }, { passive: true });
 
   stage.addEventListener('touchend', e => {
@@ -293,7 +287,6 @@ function initTouchAndHoverEvents() {
       if (diff < 0) next3DSlide();
       else prev3DSlide();
     }
-    startAutoSlide();
   }, { passive: true });
 }
 
