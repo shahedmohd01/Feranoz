@@ -410,18 +410,25 @@ function renderOwnerMenuManagement() {
           </div>
         </div>
 
-        <!-- CONTROLS ROW: PRICE EDIT & AVAILABILITY TOGGLE -->
-        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:10px; gap:8px;">
-          <div style="display:flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#6B3A2A;">
+        <!-- CONTROLS ROW: PRICE EDIT, AVAILABILITY TOGGLE & DELETE -->
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:10px; gap:6px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:3px; font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#6B3A2A;">
             <span>₹</span>
             <input type="number" min="1" value="${item.price}" onchange="updateItemPrice(${item.id}, this.value)" 
-                   style="width:72px; padding:3px 6px; border:1px solid #EFEAE3; border-radius:6px; font-family:var(--font-mono); font-weight:700; font-size:0.85rem; color:#6B3A2A; outline:none; background:#FAF7F2;" />
+                   style="width:68px; padding:3px 5px; border:1px solid #EFEAE3; border-radius:6px; font-family:var(--font-mono); font-weight:700; font-size:0.85rem; color:#6B3A2A; outline:none; background:#FAF7F2;" />
           </div>
 
-          <button onclick="toggleItemAvailability(${item.id})" 
-                  style="padding:6px 14px; border-radius:9999px; font-family:var(--font-sans); font-size:0.78rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
-            ${isAvailable ? '✓ Available' : '✕ Unavailable'}
-          </button>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button onclick="toggleItemAvailability(${item.id})" 
+                    style="padding:5px 12px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
+              ${isAvailable ? '✓ Available' : '✕ Unavailable'}
+            </button>
+
+            <button onclick="deleteMenuItem(${item.id})" title="Delete item"
+                    style="padding:5px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; background:#FFF3E0; color:#E65100; border:1px solid #FFE0B2; cursor:pointer; transition:all 0.2s ease;">
+              🗑 Delete
+            </button>
+          </div>
         </div>
 
       </div>
@@ -429,7 +436,7 @@ function renderOwnerMenuManagement() {
   }).join('');
 }
 
-// ── Item Actions: Toggle Availability, Update Price, Toggle Veg ──
+// ── Item Actions: Toggle Availability, Update Price, Toggle Veg & Delete ──
 function toggleItemAvailability(itemId) {
   const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
   const target = allItems.find(i => i.id === itemId);
@@ -461,6 +468,19 @@ function toggleItemVeg(itemId) {
   }
 }
 
+function deleteMenuItem(itemId) {
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const target = allItems.find(i => i.id === itemId);
+  if (!target) return;
+
+  if (confirm(`Are you sure you want to delete "${target.name}" from the menu?`)) {
+    const updated = allItems.filter(i => i.id !== itemId);
+    saveActiveMenuData(updated);
+    renderOwnerMenuCatTabs();
+    renderOwnerMenuManagement();
+  }
+}
+
 // ── Add New Item Modal Actions ────────────────────────────────
 function openAddItemModal() {
   const overlay = document.getElementById('add-item-modal-overlay');
@@ -480,33 +500,48 @@ function submitNewMenuItem(event) {
   const priceEl = document.getElementById('new-item-price');
   const isVegEl = document.getElementById('new-item-isveg');
   const descEl  = document.getElementById('new-item-desc');
-  const imgEl   = document.getElementById('new-item-image');
+  const fileEl  = document.getElementById('new-item-image-file');
 
   if (!nameEl || !priceEl) return;
 
-  const newItem = {
-    id: Date.now(),
-    name: nameEl.value.trim(),
-    category: catEl ? catEl.value : 'desserts',
-    price: parseInt(priceEl.value, 10) || 100,
-    isVeg: isVegEl ? isVegEl.value === 'true' : true,
-    description: descEl ? descEl.value.trim() : '',
-    image: imgEl && imgEl.value.trim() ? imgEl.value.trim() : '',
-    popular: false,
-    available: true
-  };
+  const categoryVal = catEl ? catEl.value : 'desserts';
+  const nameVal = nameEl.value.trim();
 
-  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
-  allItems.unshift(newItem);
-  saveActiveMenuData(allItems);
+  function commitNewItem(imageDataUrl) {
+    const newItem = {
+      id: Date.now(),
+      name: nameVal,
+      category: categoryVal,
+      price: parseInt(priceEl.value, 10) || 100,
+      isVeg: isVegEl ? isVegEl.value === 'true' : true,
+      description: descEl ? descEl.value.trim() : '',
+      image: imageDataUrl || '',
+      popular: false,
+      available: true
+    };
 
-  closeAddItemModal();
-  renderOwnerMenuCatTabs();
-  renderOwnerMenuManagement();
-  
-  // Reset form
-  nameEl.value = '';
-  priceEl.value = '';
-  if (descEl) descEl.value = '';
-  if (imgEl) imgEl.value = '';
+    const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+    allItems.unshift(newItem);
+    saveActiveMenuData(allItems);
+
+    closeAddItemModal();
+    renderOwnerMenuCatTabs();
+    renderOwnerMenuManagement();
+
+    // Reset form
+    nameEl.value = '';
+    priceEl.value = '';
+    if (descEl) descEl.value = '';
+    if (fileEl) fileEl.value = '';
+  }
+
+  if (fileEl && fileEl.files && fileEl.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      commitNewItem(e.target.result);
+    };
+    reader.readAsDataURL(fileEl.files[0]);
+  } else {
+    commitNewItem('');
+  }
 }

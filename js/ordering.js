@@ -248,7 +248,6 @@ function renderMenuItems(catId = 'all', search = '') {
         ${imgThumb}
         <div class="menu-item-info">
           <div class="menu-item-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static;flex-shrink:0;width:14px;height:14px;"></span>
             <span>${item.name}</span>
             ${!isAvailable ? '<span class="badge-popular" style="background:#C62828;">UNAVAILABLE</span>' : (item.popular ? '<span class="badge-popular">BESTSELLER</span>' : '')}
           </div>

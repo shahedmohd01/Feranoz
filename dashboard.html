@@ -475,12 +475,12 @@
     </div>
 
     <!-- OWNER MENU CONTROLS & CATEGORIES BAR -->
-    <div class="dash-controls-bar" style="margin-top:16px;">
-      <div class="filter-tabs" id="owner-menu-cat-tabs">
+    <div class="dash-controls-bar" style="margin-top:16px; gap:16px; align-items:center;">
+      <div class="filter-tabs" id="owner-menu-cat-tabs" style="flex:1; overflow-x:auto;">
         <!-- Category filter pills rendered by JS -->
       </div>
-      <input type="text" id="owner-menu-search" placeholder="Search menu items..." 
-             style="border:1px solid #EFEAE3; border-radius:9999px; padding:6px 14px; font-size:0.84rem; outline:none; min-width:200px;" 
+      <input type="text" id="owner-menu-search" placeholder="Search menu items by name..." 
+             style="border:1px solid #EFEAE3; border-radius:9999px; padding:8px 18px; font-size:0.86rem; outline:none; flex:1; max-width:420px; width:100%; min-width:240px; box-shadow:0 2px 8px rgba(0,0,0,0.02);" 
              oninput="filterOwnerMenu(this.value)" />
     </div>
 
@@ -548,8 +548,8 @@
       </div>
 
       <div style="margin-bottom:18px;">
-        <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">IMAGE URL / PATH</label>
-        <input type="text" id="new-item-image" placeholder="images/menu/Desserts/Pistachio Croissant.png" class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;" />
+        <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">SELECT DISH IMAGE FILE (SAVED TO CATEGORY FOLDER) *</label>
+        <input type="file" id="new-item-image-file" accept="image/*" class="auth-pass-input" style="padding:6px 10px; font-size:0.84rem;" />
       </div>
 
       <div style="display:flex; gap:10px;">
@@ -561,7 +561,7 @@
 </div>
 
 <!-- FOOTER -->
-<footer id="footer">
+<footer id="footer" style="margin-top:60px;">
   <div class="container">
     <div class="footer-top">
       <div class="footer-logo">Feranoz Owner Console</div>
