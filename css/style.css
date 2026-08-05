@@ -1044,7 +1044,7 @@ h3 {
 .footer-logo {
   font-family: var(--font-logo) !important;
   font-size: 2.3rem !important;
-  font-weight: 400 !important;
+  font-weight: 300 !important;
   color: #FFFFFF;
   line-height: 1;
 }
@@ -1275,7 +1275,9 @@ h3 {
 }
 
 /* ── Prevent Mobile OS Auto-Hyperlink on Address Text ────────── */
-.no-addr-link, .no-addr-link a, .no-addr-link * {
+.no-addr-link,
+.no-addr-link a,
+.no-addr-link * {
   pointer-events: none !important;
   color: inherit !important;
   text-decoration: none !important;
@@ -1318,7 +1320,7 @@ h3 {
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 8px 32px rgba(44, 24, 16, 0.10);
 }
 
@@ -1343,7 +1345,7 @@ h3 {
 .delivery-platform-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 55%);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: flex-end;
