@@ -319,8 +319,15 @@ function renderMenuPreview(category = 'all') {
   if (category !== 'all') {
     items = allItems.filter(i => i.category === category);
   } else {
-    const featuredSet = new Set(FEATURED_IDS || [101, 102, 103, 105, 401, 601]);
-    items = allItems.filter(i => i.popular === true || featuredSet.has(i.id));
+    // Only show items explicitly marked as bestseller by the owner
+    const popularItems = allItems.filter(i => i.popular === true);
+    if (popularItems.length > 0) {
+      items = popularItems;
+    } else {
+      // Fallback: show hardcoded featured set if owner hasn't set any bestsellers yet
+      const featuredSet = new Set(FEATURED_IDS || [101, 102, 103, 105, 401, 601]);
+      items = allItems.filter(i => featuredSet.has(i.id));
+    }
   }
 
   if (items.length === 0) {
@@ -369,6 +376,9 @@ try {
 window.addEventListener('storage', (e) => {
   if (e.key === 'feranoz_custom_menu') {
     renderMenuPreview();
+    // Also refresh the 3D bestseller carousel when menu data changes
+    current3DIndex = 0;
+    init3DShowcase();
   }
 });
 

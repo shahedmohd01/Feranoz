@@ -3,6 +3,31 @@
 //  Extracted from Swiggy & Real Photo Library
 // ============================================================
 
+// ── Cafe Configuration (Location, Tables, Auth) ───────────────
+const CAFE_CONFIG = {
+  // Real cafe coordinates — Feranoz, Road No 7, Banjara Hills, Hyderabad
+  lat: 17.4241,
+  lng: 78.4449,
+
+  // Test/owner location — used during development to bypass strict geo check
+  // (user's current test location: https://maps.app.goo.gl/34Qay1yVN4iWnuSk7)
+  testLat: 17.4730431,
+  testLng: 78.4895939,
+  testLocationName: 'Test Location (Owner Device)',
+
+  // Radius in meters around the real cafe within which ordering is allowed
+  radiusMeters: 400,
+
+  // Set to true to bypass geolocation check entirely during development
+  testModeEnabled: false,
+
+  // Total number of dine-in tables shown in the ordering modal
+  totalTables: 10,
+
+  // Owner dashboard passcode
+  dashboardPassword: 'feranoz2024'
+};
+
 const MENU_DATA = [
   {
     "id": 101,

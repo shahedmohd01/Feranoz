@@ -118,7 +118,7 @@ function setBanner(type, text) {
   const banner = document.getElementById('location-banner');
   if (!banner) return;
   banner.className = `${type}`;
-  banner.textContent = text;
+  banner.innerHTML = text;
 }
 
 function getDistanceMeters(lat1, lon1, lat2, lon2) {

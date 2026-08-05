@@ -412,8 +412,11 @@ function renderOwnerMenuManagement() {
 
         <!-- CONTROLS ROW: STATIC PRICE, AVAILABILITY TOGGLE, EDIT & DELETE -->
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:8px; gap:6px; flex-wrap:wrap;">
-          <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#6B3A2A;">
-            ₹${item.price}
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#6B3A2A;">
+              ₹${item.price}
+            </div>
+            ${item.popular ? `<span style="font-family:var(--font-mono); font-size:0.62rem; font-weight:700; background:#FFF8E1; color:#D84315; border:1px solid #FFE0B2; padding:2px 8px; border-radius:9999px; letter-spacing:0.04em;">⭐ BESTSELLER</span>` : ''}
           </div>
 
           <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
