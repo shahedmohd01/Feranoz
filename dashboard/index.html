@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feranoz Owner Console — Admin Login</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #140E0A;
+      --bg-card: #1E1611;
+      --gold: #C9A84C;
+      --gold-light: #E5C875;
+      --ink-light: #F4EFEA;
+      --ink-muted: #A39387;
+      --danger: #E53935;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(201, 168, 76, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(201, 168, 76, 0.08) 0%, transparent 45%);
+      color: var(--ink-light);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-card);
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      border-radius: 24px;
+      padding: 40px 32px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(201, 168, 76, 0.08);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+    }
+
+    .brand-title {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #140E0A;
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: #FFFFFF;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      letter-spacing: 0.2em;
+      text-align: center;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.2);
+    }
+
+    .error-alert {
+      display: none;
+      background: rgba(229, 57, 53, 0.15);
+      border: 1px solid rgba(229, 57, 53, 0.4);
+      color: #FF8A80;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--bg-dark);
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 8px 20px rgba(201, 168, 76, 0.25);
+    }
+
+    .btn-login:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .login-footer {
+      margin-top: 28px;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+
+    .login-footer a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="brand-title">Feranoz</div>
+    <div class="brand-subtitle">Owner Console Portal</div>
+
+    <div class="error-alert" id="error-alert"></div>
+
+    <form id="login-form" onsubmit="handleLoginSubmit(event)">
+      <div class="form-group">
+        <label for="passcode-input" class="form-label">Admin Security Passcode</label>
+        <input 
+          type="password" 
+          id="passcode-input" 
+          class="form-input" 
+          placeholder="••••" 
+          maxlength="10" 
+          required 
+          autofocus 
+        />
+      </div>
+
+      <button type="submit" class="btn-login">
+        Login to Owner Console →
+      </button>
+    </form>
+
+    <div class="login-footer">
+      Protected Administrator Management Portal<br>
+      Default Passcode: <code>1234</code>
+    </div>
+  </div>
+
+  <script src="js/menu-data.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Auto-redirect to dashboard if already logged in
+      const token = localStorage.getItem('feranoz_owner_auth_token') || sessionStorage.getItem('feranoz_owner_auth_token');
+      if (token) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById('passcode-input');
+      const errorBox = document.getElementById('error-alert');
+      
+      const res = validateOwnerLogin(input.value.trim());
+
+      if (res.success) {
+        window.location.href = 'dashboard.html';
+      } else {
+        errorBox.textContent = res.message;
+        errorBox.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+    }
+  </script>
+</body>
+</html>
