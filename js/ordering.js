@@ -405,6 +405,10 @@ function placeOrder() {
   const customerPhone = document.getElementById('customer-phone')?.value.trim() || '';
   const specialNotes = document.getElementById('special-instructions')?.value.trim() || '';
 
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
   const order = {
     id: generateOrderId(),
     tableNumber: selectedTable,
@@ -414,8 +418,8 @@ function placeOrder() {
     customerPhone,
     specialNotes,
     status: 'new',
-    timestamp: new Date().toISOString(),
-    placedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    timestamp: now.toISOString(),
+    placedAt: `${dateStr}, ${timeStr}`,
   };
 
   saveOrder(order);

@@ -1301,3 +1301,106 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Order Online / Delivery Platforms Section ───────────── */
+.delivery-platforms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.delivery-platform-card {
+  position: relative;
+  display: block;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 32px rgba(44, 24, 16, 0.10);
+}
+
+.delivery-platform-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 52px rgba(44, 24, 16, 0.18);
+}
+
+.delivery-platform-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-lg);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.delivery-platform-card:hover .delivery-platform-img {
+  transform: scale(1.04);
+}
+
+.delivery-platform-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.delivery-platform-card:hover .delivery-platform-overlay {
+  opacity: 1;
+}
+
+.delivery-platform-cta {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+  .delivery-platforms-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .delivery-platform-img {
+    height: 160px;
+  }
+
+  .delivery-platform-overlay {
+    opacity: 1;
+  }
+}
+
+/* ── Full-Page Order — Back Button ───────────────────────── */
+.modal-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #F3EDE5;
+  border: 1.5px solid #EFEAE3;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.modal-back-btn:hover {
+  background: var(--ink);
+  color: #FFFFFF;
+  border-color: var(--ink);
+  transform: translateX(-2px);
+}

@@ -145,6 +145,18 @@ function filterOrders(status, btnEl) {
   renderOrdersGrid();
 }
 
+function formatOrderDateTime(order) {
+  if (order.timestamp) {
+    const d = new Date(order.timestamp);
+    if (!isNaN(d.getTime())) {
+      const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      const timeStr = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      return `${dateStr}, ${timeStr}`;
+    }
+  }
+  return order.placedAt || 'Just now';
+}
+
 function renderOrdersGrid() {
   const container = document.getElementById('orders-grid');
   const countText = document.getElementById('order-count-text');
@@ -183,7 +195,7 @@ function renderOrdersGrid() {
           <div class="order-id" style="margin-top:6px;">Order #${order.id}</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-family:var(--font-mono); font-size:0.82rem; font-weight:700; color:var(--ink);">${order.placedAt || 'Just now'}</div>
+          <div style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:var(--ink);">${formatOrderDateTime(order)}</div>
           ${order.customerName ? `<div style="font-size:0.84rem; color:var(--ink-soft); font-weight:600; margin-top:2px;">Guest: ${order.customerName}</div>` : ''}
         </div>
       </div>

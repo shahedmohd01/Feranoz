@@ -218,6 +218,47 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════
+     ORDER ONLINE SECTION (Swiggy & Zomato)
+═══════════════════════════════════════════════════════════ -->
+  <section id="order-online" class="section scroll-reveal" aria-labelledby="order-online-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Delivery & Pickup</span>
+        <h2 id="order-online-heading" class="section-title">Order Online</h2>
+        <p class="section-subtitle">Get Feranoz delivered to your doorstep via your favourite food app</p>
+      </div>
+
+      <div class="delivery-platforms-grid">
+
+        <!-- Swiggy -->
+        <a href="https://www.swiggy.com/restaurants/feranoz-road-number-7-banjara-hills-hyderabad-826985"
+           target="_blank" rel="noopener noreferrer"
+           class="delivery-platform-card swiggy-card"
+           id="swiggy-order-btn"
+           aria-label="Order on Swiggy">
+          <img src="images/swiggy_banner.png" alt="Order on Swiggy — Fast Delivery" class="delivery-platform-img" />
+          <div class="delivery-platform-overlay">
+            <span class="delivery-platform-cta">Order on Swiggy →</span>
+          </div>
+        </a>
+
+        <!-- Zomato -->
+        <a href="https://www.zomato.com/hyderabad/feranoz-banjara-hills"
+           target="_blank" rel="noopener noreferrer"
+           class="delivery-platform-card zomato-card"
+           id="zomato-order-btn"
+           aria-label="Order on Zomato">
+          <img src="images/zomato_banner.png" alt="Order on Zomato — Restaurant Delivery" class="delivery-platform-img" />
+          <div class="delivery-platform-overlay">
+            <span class="delivery-platform-cta">Order on Zomato →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
      SIMPLE CONTACT SECTION (Scroll Reveal Animated)
 ════════════════════════════════════════════════════════════ -->
   <section id="contact" class="section scroll-reveal" aria-labelledby="contact-heading">
@@ -288,8 +329,11 @@
     <div class="modal-box">
 
       <div class="modal-header">
-        <h3>Feranoz Table Ordering System</h3>
-        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">✕</button>
+        <button class="modal-back-btn" id="modal-close-btn" aria-label="Back to Menu" onclick="closeOrderModal()">
+          ← Back to Menu
+        </button>
+        <h3>Feranoz Table Ordering</h3>
+        <div style="width:120px;"></div>
       </div>
 
       <div class="modal-body">
