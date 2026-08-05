@@ -227,7 +227,12 @@ function renderMenuItems(catId = 'all', search = '') {
   if (!container) return;
 
   const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
-  let items = catId === 'all' ? allItems : allItems.filter(m => m.category === catId);
+  let items = allItems;
+  if (catId === 'bestseller') {
+    items = allItems.filter(m => m.popular === true);
+  } else if (catId !== 'all') {
+    items = allItems.filter(m => m.category === catId);
+  }
 
   if (search) {
     const q = search.toLowerCase();
@@ -309,32 +314,35 @@ function updateQty(itemId, delta) {
   renderCart();
 }
 
-function removeFromCart(itemId) {
-  cart = cart.filter(c => c.id !== itemId);
+function clearCart() {
+  cart = [];
   renderMenuItems(activeCat, document.getElementById('menu-search')?.value || '');
   renderCart();
 }
 
-function clearCart() {
-  cart = [];
-  renderMenuItems(activeCat, '');
-  renderCart();
-}
-
 function cartTotal() {
-  return cart.reduce((sum, c) => sum + c.price * c.qty, 0);
-}
-function cartItemCount() {
-  return cart.reduce((sum, c) => sum + c.qty, 0);
+  return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 }
 
-// ── Render Cart ───────────────────────────────────────────────
 function renderCart() {
-  const listEl   = document.getElementById('cart-items-list');
-  const totalEl  = document.getElementById('cart-total');
-  const countBadge = document.getElementById('cart-count-badge');
+  const countBadge  = document.getElementById('cart-count-badge');
+  const listEl      = document.getElementById('cart-items-list');
+  const totalEl     = document.getElementById('cart-total');
+  const countMobile = document.getElementById('mobile-cart-items-count');
+  const priceMobile = document.getElementById('mobile-cart-total-price');
+  const btnProceed  = document.getElementById('btn-proceed-step3');
 
-  if (countBadge) countBadge.textContent = cartItemCount();
+  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  const totalPrice = cartTotal();
+
+  if (countBadge) countBadge.textContent = totalQty;
+  if (countMobile) countMobile.textContent = `${totalQty} ${totalQty === 1 ? 'Item' : 'Items'}`;
+  if (priceMobile) priceMobile.textContent = `₹${totalPrice}`;
+
+  if (btnProceed) {
+    btnProceed.disabled = totalQty === 0 || !selectedTable;
+    btnProceed.textContent = totalQty > 0 ? `Proceed to Order (₹${totalPrice}) →` : 'Proceed to Order →';
+  }
 
   if (!listEl) return;
 
@@ -359,8 +367,14 @@ function renderCart() {
     `).join('');
   }
 
-  if (totalEl) totalEl.textContent = `₹${cartTotal()}`;
+  if (totalEl) totalEl.textContent = `₹${totalPrice}`;
   updatePlaceOrderBtn();
+}
+
+function removeFromCart(itemId) {
+  cart = cart.filter(c => c.id !== itemId);
+  renderMenuItems(activeCat, document.getElementById('menu-search')?.value || '');
+  renderCart();
 }
 
 // ── Table Selection ───────────────────────────────────────────
@@ -401,36 +415,78 @@ function updateMobileOrderFlow() {
   const isMobile = window.innerWidth <= 768;
   const step1Box = document.getElementById('step-1-table-box');
   const step2Box = document.getElementById('step-2-menu-box');
-  const modalRight = document.querySelector('.modal-right');
+  const step3Box = document.getElementById('step-3-checkout-box');
   const changeTableBtn = document.getElementById('btn-change-table');
   const step1Label = document.getElementById('step-1-label');
+  const backBtn = document.getElementById('modal-back-step-btn');
+  const stepTitle = document.getElementById('modal-step-title');
 
   if (!isMobile) {
-    // Desktop View: Show both steps and cart simultaneously
+    // Desktop View: Show all sections simultaneously
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'block';
-    if (modalRight) modalRight.style.display = 'flex';
+    if (step3Box) step3Box.style.display = 'flex';
     if (changeTableBtn) changeTableBtn.style.display = 'none';
     if (step1Label) step1Label.textContent = '1. Select Your Table Number:';
+    if (backBtn) backBtn.innerHTML = '← Back to Menu';
+    if (stepTitle) stepTitle.textContent = 'Feranoz Table Ordering';
     return;
   }
 
-  // Mobile View
-  if (mobileOrderStep === 1 && !selectedTable) {
-    // Step 1: Only show Table Selection Grid
+  // Mobile 3-Step View
+  if (mobileOrderStep === 1 || !selectedTable) {
+    // Step 1: Table Selection
+    mobileOrderStep = 1;
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'none';
-    if (modalRight) modalRight.style.display = 'none';
+    if (step3Box) step3Box.style.display = 'none';
     if (changeTableBtn) changeTableBtn.style.display = 'none';
-    if (step1Label) step1Label.textContent = '1. Select Your Table Number to Start:';
-  } else {
-    // Step 2: Show Menu List & Cart
+    if (step1Label) step1Label.textContent = '1. Select Your Table Number:';
+    if (backBtn) backBtn.innerHTML = '← Exit to Site';
+    if (stepTitle) stepTitle.textContent = 'Step 1: Pick Table';
+  } else if (mobileOrderStep === 2) {
+    // Step 2: Dish Selection & Search
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'block';
-    if (modalRight) modalRight.style.display = 'flex';
+    if (step3Box) step3Box.style.display = 'none';
     if (changeTableBtn) changeTableBtn.style.display = 'inline-block';
     if (step1Label) step1Label.textContent = `✓ Table ${selectedTable} Selected`;
+    if (backBtn) backBtn.innerHTML = '← Change Table';
+    if (stepTitle) stepTitle.textContent = 'Step 2: Choose Dishes';
+  } else if (mobileOrderStep === 3) {
+    // Step 3: Final Order Place & Checkout
+    if (step1Box) step1Box.style.display = 'none';
+    if (step2Box) step2Box.style.display = 'none';
+    if (step3Box) step3Box.style.display = 'flex';
+    if (backBtn) backBtn.innerHTML = '← Add More Items';
+    if (stepTitle) stepTitle.textContent = `Step 3: Table ${selectedTable} Checkout`;
   }
+}
+
+function handleModalBackStep() {
+  const isMobile = window.innerWidth <= 768;
+  if (!isMobile || mobileOrderStep === 1) {
+    closeOrderModal();
+  } else if (mobileOrderStep === 2) {
+    resetTableSelectionMobile();
+  } else if (mobileOrderStep === 3) {
+    goToStep2Mobile();
+  }
+}
+
+function goToStep2Mobile() {
+  mobileOrderStep = 2;
+  updateMobileOrderFlow();
+  const body = document.querySelector('.modal-body');
+  if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToStep3Mobile() {
+  if (cart.length === 0 || !selectedTable) return;
+  mobileOrderStep = 3;
+  updateMobileOrderFlow();
+  const body = document.querySelector('.modal-body');
+  if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 window.addEventListener('resize', updateMobileOrderFlow);

@@ -329,10 +329,10 @@
     <div class="modal-box">
 
       <div class="modal-header">
-        <button class="modal-back-btn" id="modal-close-btn" aria-label="Back to Menu" onclick="closeOrderModal()">
+        <button class="modal-back-btn" id="modal-back-step-btn" aria-label="Back" onclick="handleModalBackStep()">
           ← Back to Menu
         </button>
-        <h3>Feranoz Table Ordering</h3>
+        <h3 id="modal-step-title">Feranoz Table Ordering</h3>
         <div id="location-banner" class="checking">
           Verifying location…
         </div>
@@ -349,7 +349,7 @@
                 style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block;">
                 1. Select Your Table Number:
               </label>
-              <button id="btn-change-table" onclick="resetTableSelectionMobile()" style="display:none; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; color:#C9A84C; background:none; border:none; cursor:pointer; text-decoration:underline;">
+              <button id="btn-change-table" onclick="resetTableSelectionMobile()" style="display:none; font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#C9A84C; background:none; border:none; cursor:pointer; text-decoration:underline;">
                 Change Table
               </button>
             </div>
@@ -372,18 +372,36 @@
             </div>
 
             <div class="menu-items-container" id="menu-items-container" style="margin-top:10px;"></div>
+
+            <!-- STEP 2 MOBILE BOTTOM BAR -->
+            <div id="mobile-step2-bottom-bar" class="mobile-step2-bottom-bar">
+              <div class="mobile-cart-summary">
+                <span id="mobile-cart-items-count">0 Items</span>
+                <span id="mobile-cart-total-price">₹0</span>
+              </div>
+              <button class="btn-primary" id="btn-proceed-step3" onclick="goToStep3Mobile()" disabled style="padding:10px 18px; font-size:0.88rem; border-radius:9999px;">
+                Proceed to Order →
+              </button>
+            </div>
           </div>
 
         </div>
 
-        <div class="modal-right">
+        <!-- STEP 3 / RIGHT SIDE: FINAL CHECKOUT & ORDER PLACING -->
+        <div class="modal-right" id="step-3-checkout-box">
           <div>
             <div class="cart-title">
               <span>Selected Cart (<span id="cart-count-badge">0</span>)</span>
-              <button onclick="clearCart()" style="font-size:0.75rem; color:#C62828; cursor:pointer;">Clear</button>
+              <button onclick="clearCart()" style="font-size:0.75rem; color:#C62828; cursor:pointer; background:none; border:none;">Clear</button>
             </div>
 
             <div class="cart-items-list" id="cart-items-list"></div>
+
+            <div style="margin-top:14px; margin-bottom:12px;">
+              <button onclick="goToStep2Mobile()" class="btn-outline" style="width:100%; font-size:0.82rem; padding:8px 12px; border-style:dashed;">
+                + Add More Items
+              </button>
+            </div>
 
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
               <input type="text" id="customer-name" placeholder="Your Name (Optional)"

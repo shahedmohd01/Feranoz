@@ -1137,6 +1137,10 @@ const CATEGORIES = [
     "label": "All Items"
   },
   {
+    "id": "bestseller",
+    "label": "⭐ Bestsellers"
+  },
+  {
     "id": "appetizers",
     "label": "Appetizers"
   },
