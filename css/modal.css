@@ -398,3 +398,60 @@
   max-width: 440px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-height: 94vh;
+    border-radius: 18px;
+    overflow-x: hidden;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .modal-body {
+    padding: 14px;
+    gap: 16px;
+    overflow-x: hidden;
+  }
+
+  .table-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .table-btn {
+    padding: 8px 2px;
+    font-size: 0.8rem;
+  }
+
+  .menu-items-container {
+    max-height: 240px;
+  }
+
+  .menu-item-row {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .modal-right {
+    max-height: none;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .confirm-box {
+    padding: 24px 16px;
+    max-width: 92vw;
+  }
+}
