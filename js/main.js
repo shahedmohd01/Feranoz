@@ -66,8 +66,8 @@ function initScrollReveal() {
       }
     });
   }, {
-    threshold: 0.12,
-    rootMargin: '-30px 0px -30px 0px'
+    threshold: 0.01,
+    rootMargin: '0px 0px 40px 0px'
   });
 
   revealElements.forEach(el => observer.observe(el));
@@ -100,7 +100,7 @@ function initNavbar() {
   });
 }
 
-// ── 3D Full Photo Stage Showcase ──────────────────────────────
+// ── 3D Full Photo Stage Showcase (3 Bestseller Items Grid) ────
 let SHOWCASE_DATA = [];
 
 function init3DShowcase() {
@@ -112,29 +112,30 @@ function init3DShowcase() {
   let popularItems = allItems.filter(i => i.popular === true);
   
   if (popularItems.length === 0 && typeof SHOWCASE_ITEMS_3D !== 'undefined') {
-    popularItems = SHOWCASE_ITEMS_3D.map(i => ({ name: i.name, image: i.img, category: 'bestseller' }));
+    popularItems = SHOWCASE_ITEMS_3D.map(i => ({ name: i.name, image: i.img, category: 'bestseller', price: i.price, description: i.desc }));
   }
 
-  SHOWCASE_DATA = popularItems;
+  // Strictly limit to 3 fixed items maximum
+  SHOWCASE_DATA = popularItems.slice(0, 3);
 
   track.innerHTML = SHOWCASE_DATA.map((item, idx) => `
-    <div class="showcase-3d-item" id="showcase-item-${idx}" onclick="set3DIndex(${idx})">
-      <div class="showcase-card-inner">
+    <div class="bestseller-card-col" id="showcase-item-${idx}" onclick="set3DIndex(${idx})" style="cursor:pointer;">
+      <div class="showcase-card-inner ${idx === current3DIndex ? 'active' : ''}">
         <div class="showcase-card-img-wrap">
           ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
           <span class="card-bestseller-badge">BESTSELLER</span>
         </div>
+        <p class="bestseller-title">${item.name}</p>
       </div>
     </div>
   `).join('');
 
   if (dotsContainer) {
     dotsContainer.innerHTML = SHOWCASE_DATA.map((_, idx) => `
-      <div class="showcase-dot ${idx === 0 ? 'active' : ''}" onclick="set3DIndex(${idx})"></div>
+      <div class="showcase-dot ${idx === current3DIndex ? 'active' : ''}" onclick="set3DIndex(${idx})"></div>
     `).join('');
   }
 
-  current3DIndex = 0;
   update3DStage();
 }
 
@@ -156,23 +157,28 @@ function update3DStage() {
     const el = document.getElementById(`showcase-item-${idx}`);
     if (!el) return;
 
-    el.className = 'showcase-3d-item';
-
-    if (idx === current3DIndex) {
-      el.classList.add('active');
-    } else if (idx === (current3DIndex - 1 + total) % total) {
-      el.classList.add('prev');
-    } else if (idx === (current3DIndex + 1) % total) {
-      el.classList.add('next');
+    const inner = el.querySelector('.showcase-card-inner');
+    if (inner) {
+      inner.classList.toggle('active', idx === current3DIndex);
     }
   });
 
   const titleEl = document.getElementById('showcase-title');
   const catEl   = document.getElementById('showcase-category');
+  const infoBar = document.getElementById('showcase-info-bar');
+
   const activeItem = SHOWCASE_DATA[current3DIndex];
   if (activeItem) {
     if (titleEl) titleEl.textContent = activeItem.name;
     if (catEl) catEl.textContent = (activeItem.category || 'BESTSELLER').toUpperCase();
+
+    if (infoBar) {
+      infoBar.innerHTML = `
+        <h3 style="font-family:var(--font-serif); font-size:1.25rem; font-weight:700; color:var(--ink); margin-bottom:4px;">${activeItem.name}</h3>
+        <div style="font-family:var(--font-mono); font-weight:700; color:#6B3A2A; font-size:1rem; margin-bottom:8px;">₹${activeItem.price || 250}</div>
+        <button class="btn-primary" onclick="openOrderModal(); return false;" style="font-size:0.82rem; padding:8px 18px;">Order This Bestseller →</button>
+      `;
+    }
   }
 }
 

@@ -17,6 +17,12 @@
   <style>
     html, body {
       height: 100%;
+      max-width: 100vw;
+      width: 100%;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
@@ -30,11 +36,17 @@
 
     main {
       flex: 1 0 auto;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     #footer {
       margin-top: auto;
       width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     /* Auth Passcode Overlay */
@@ -99,6 +111,8 @@
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 30px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .dash-stats-grid {
@@ -106,6 +120,8 @@
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
       margin-bottom: 36px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .dash-stat-card {
@@ -117,6 +133,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      box-sizing: border-box;
     }
 
     .stat-label {
@@ -147,6 +164,8 @@
       padding: 14px 20px;
       border-radius: 9999px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .filter-tabs {
@@ -178,7 +197,112 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 24px;
+      width: 100%;
+      box-sizing: border-box;
     }
+
+    /* Mobile Responsive Dashboard Overrides */
+    @media (max-width: 768px) {
+      body {
+        padding-top: calc(var(--nav-height) + 16px);
+      }
+
+      .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+
+      .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .dash-header > div:last-child {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .dash-header button {
+        flex: 1 1 auto;
+        font-size: 0.8rem !important;
+        padding: 8px 12px !important;
+        text-align: center;
+      }
+
+      .dash-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+      }
+
+      .dash-stat-card {
+        padding: 14px !important;
+      }
+
+      .stat-val {
+        font-size: 1.6rem !important;
+      }
+
+      .dash-controls-bar {
+        border-radius: 18px !important;
+        padding: 10px 14px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+      }
+
+      #owner-menu-search {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .orders-grid, #owner-menu-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      #footer {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin-top: 40px !important;
+        padding: 24px 16px !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden;
+      }
+
+      .footer-top {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        width: 100% !important;
+        gap: 10px !important;
+      }
+
+      .footer-logo {
+        font-size: 1.3rem !important;
+        text-align: center !important;
+        width: 100% !important;
+      }
+
+      .footer-links {
+        justify-content: center !important;
+        width: 100% !important;
+      }
+
+      .footer-bottom {
+        text-align: center !important;
+        width: 100% !important;
+        margin-top: 12px !important;
+        font-size: 0.72rem !important;
+      }
+    }
+  </style>
 
     .order-card {
       background: #FFFFFF;
