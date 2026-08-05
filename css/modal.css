@@ -426,13 +426,16 @@
   }
 
   .table-grid {
-    grid-template-columns: repeat(5, 1fr);
-    gap: 4px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
   }
 
   .table-btn {
-    padding: 8px 2px;
-    font-size: 0.8rem;
+    padding: 8px 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: center;
   }
 
   .menu-items-container {

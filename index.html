@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>Feranoz Patisserie &amp; Cafe | Banjara Hills, Hyderabad</title>
   <meta name="description"
     content="Feranoz Patisserie &amp; Cafe — Artisan pastries, gourmet pizzas, high-protein wraps &amp; single-origin coffee in Banjara Hills, Hyderabad." />
@@ -224,15 +225,14 @@
       <div class="section-header">
         <span class="section-tag">Location &amp; Hours</span>
         <h2 id="contact-heading" class="section-title">Visit Feranoz Cafe</h2>
-        <p class="section-subtitle">Road Number 7, Banjara Hills, Hyderabad</p>
+        <p class="section-subtitle no-addr-link">Road Number 7, Banjara Hills, Hyderabad</p>
       </div>
 
       <div class="simple-contact-card">
         <div class="contact-box">
           <span class="contact-tag">ADDRESS</span>
           <h4>Location</h4>
-          <p>8-2-542, v/8, Rd Number 7, Beside Ratnadeep supermarket, Zahara Nagar, Banjara Hills, Hyderabad 500034
-          </p>
+          <p class="no-addr-link">8-2-542, v/8, Rd Number 7, Beside Ratnadeep supermarket, Zahara Nagar, Banjara Hills, Hyderabad 500034</p>
         </div>
 
         <div class="contact-box">
@@ -334,6 +334,9 @@
 
             <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
               <input type="text" id="customer-name" placeholder="Your Name (Optional)"
+                style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none;" />
+
+              <input type="tel" id="customer-phone" placeholder="Mobile Number (Optional)"
                 style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none;" />
 
               <textarea id="special-instructions" rows="2" placeholder="Special Instructions / Requests..."

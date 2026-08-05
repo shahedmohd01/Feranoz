@@ -365,7 +365,7 @@ function renderTableGrid() {
                     id="table-btn-${num}"
                     onclick="selectTable(${num})"
                     aria-label="Table ${num}">
-              ${num}
+              Table ${num}
             </button>`;
   }).join('');
 }
@@ -402,6 +402,7 @@ function placeOrder() {
   if (locationStatus !== 'allowed' || cart.length === 0 || !selectedTable) return;
 
   const customerName = document.getElementById('customer-name')?.value.trim() || '';
+  const customerPhone = document.getElementById('customer-phone')?.value.trim() || '';
   const specialNotes = document.getElementById('special-instructions')?.value.trim() || '';
 
   const order = {
@@ -410,6 +411,7 @@ function placeOrder() {
     items: [...cart],
     total: cartTotal(),
     customerName,
+    customerPhone,
     specialNotes,
     status: 'new',
     timestamp: new Date().toISOString(),

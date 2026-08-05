@@ -101,37 +101,58 @@ function initNavbar() {
 }
 
 // ── 3D Full Photo Stage Showcase ──────────────────────────────
+let SHOWCASE_DATA = [];
+
 function init3DShowcase() {
   const track = document.getElementById('showcase-items-track');
   const dotsContainer = document.getElementById('showcase-dots');
   if (!track) return;
 
-  // Render Full Photo Cards with Pure Real Photos
-  track.innerHTML = SHOWCASE_ITEMS_3D.map((item, idx) => `
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : (typeof MENU_DATA !== 'undefined' ? MENU_DATA : []);
+  let popularItems = allItems.filter(i => i.popular === true);
+  
+  if (popularItems.length === 0 && typeof SHOWCASE_ITEMS_3D !== 'undefined') {
+    popularItems = SHOWCASE_ITEMS_3D.map(i => ({ name: i.name, image: i.img, category: 'bestseller' }));
+  }
+
+  SHOWCASE_DATA = popularItems;
+
+  track.innerHTML = SHOWCASE_DATA.map((item, idx) => `
     <div class="showcase-3d-item" id="showcase-item-${idx}" onclick="set3DIndex(${idx})">
       <div class="showcase-card-inner">
         <div class="showcase-card-img-wrap">
-          <img src="${encodeURI(item.img)}" alt="${item.name}" loading="lazy" />
+          ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
           <span class="card-bestseller-badge">BESTSELLER</span>
         </div>
       </div>
     </div>
   `).join('');
 
-  // Render Dots
   if (dotsContainer) {
-    dotsContainer.innerHTML = SHOWCASE_ITEMS_3D.map((_, idx) => `
+    dotsContainer.innerHTML = SHOWCASE_DATA.map((_, idx) => `
       <div class="showcase-dot ${idx === 0 ? 'active' : ''}" onclick="set3DIndex(${idx})"></div>
     `).join('');
   }
 
+  current3DIndex = 0;
   update3DStage();
 }
 
-function update3DStage() {
-  const total = SHOWCASE_ITEMS_3D.length;
+function set3DIndex(idx) {
+  current3DIndex = idx;
+  update3DStage();
 
-  SHOWCASE_ITEMS_3D.forEach((_, idx) => {
+  const dots = document.querySelectorAll('.showcase-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === idx);
+  });
+}
+
+function update3DStage() {
+  const total = SHOWCASE_DATA.length;
+  if (total === 0) return;
+
+  SHOWCASE_DATA.forEach((_, idx) => {
     const el = document.getElementById(`showcase-item-${idx}`);
     if (!el) return;
 
@@ -143,63 +164,28 @@ function update3DStage() {
       el.classList.add('prev');
     } else if (idx === (current3DIndex + 1) % total) {
       el.classList.add('next');
-    } else if (idx < current3DIndex) {
-      el.classList.add('hidden-left');
-    } else {
-      el.classList.add('hidden-right');
     }
   });
 
-  // Update Dots
-  document.querySelectorAll('.showcase-dot').forEach((dot, idx) => {
-    dot.classList.toggle('active', idx === current3DIndex);
-  });
-
-  // Update Active Info Bar
-  const infoBar = document.getElementById('showcase-info-bar');
-  if (infoBar) {
-    const activeItem = SHOWCASE_ITEMS_3D[current3DIndex];
-    infoBar.innerHTML = `
-      <h2 class="showcase-info-title">${activeItem.name}</h2>
-      <div class="showcase-info-price">₹${activeItem.price}</div>
-      <p style="font-size:0.92rem; color:var(--ink-soft); margin-bottom:14px;">${activeItem.desc}</p>
-      <button class="showcase-info-btn" onclick="openOrderModal(); return false;">
-        Order this item →
-      </button>
-    `;
+  const titleEl = document.getElementById('showcase-title');
+  const catEl   = document.getElementById('showcase-category');
+  const activeItem = SHOWCASE_DATA[current3DIndex];
+  if (activeItem) {
+    if (titleEl) titleEl.textContent = activeItem.name;
+    if (catEl) catEl.textContent = (activeItem.category || 'BESTSELLER').toUpperCase();
   }
 }
 
-function move3DShowcase(direction) {
-  if (isTransitioning) return;
-  isTransitioning = true;
-  setTimeout(() => { isTransitioning = false; }, 350);
-
-  const total = SHOWCASE_ITEMS_3D.length;
-  current3DIndex = (current3DIndex + direction + total) % total;
-  update3DStage();
+function next3DSlide() {
+  if (SHOWCASE_DATA.length === 0) return;
+  current3DIndex = (current3DIndex + 1) % SHOWCASE_DATA.length;
+  set3DIndex(current3DIndex);
 }
 
-function set3DIndex(idx) {
-  if (isTransitioning) return;
-  isTransitioning = true;
-  setTimeout(() => { isTransitioning = false; }, 350);
-
-  current3DIndex = idx;
-  update3DStage();
-}
-
-function start3DAutoSlide() {
-  // Disabled as requested
-}
-
-function stop3DAutoSlide() {
-  // Disabled as requested
-}
-
-function reset3DAutoSlide() {
-  stop3DAutoSlide();
-  start3DAutoSlide();
+function prev3DSlide() {
+  if (SHOWCASE_DATA.length === 0) return;
+  current3DIndex = (current3DIndex - 1 + SHOWCASE_DATA.length) % SHOWCASE_DATA.length;
+  set3DIndex(current3DIndex);
 }
 
 // ── Menu Preview Rendering ───────────────────────────────────
@@ -221,7 +207,7 @@ function renderMenuPreview(category = 'all') {
     items = allItems.filter(i => i.category === category);
   } else {
     const featuredSet = new Set(FEATURED_IDS || [101, 102, 103, 105, 401, 601]);
-    items = allItems.filter(i => featuredSet.has(i.id));
+    items = allItems.filter(i => i.popular === true || featuredSet.has(i.id));
   }
 
   if (items.length === 0) {
@@ -262,6 +248,7 @@ try {
   menuBc.onmessage = (e) => {
     if (e.data && e.data.type === 'MENU_UPDATED') {
       renderMenuPreview();
+      init3DShowcase();
     }
   };
 } catch(err) {}

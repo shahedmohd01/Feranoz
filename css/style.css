@@ -1235,6 +1235,15 @@ h3 {
   }
 }
 
+/* ── Prevent Mobile OS Auto-Hyperlink on Address Text ────────── */
+.no-addr-link, .no-addr-link a, .no-addr-link * {
+  pointer-events: none !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  cursor: default !important;
+}
+
 @media (max-width: 480px) {
   .hero-card-img {
     height: 260px;

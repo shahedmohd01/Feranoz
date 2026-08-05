@@ -390,48 +390,46 @@ function renderOwnerMenuManagement() {
   container.innerHTML = filtered.map(item => {
     const isAvailable = item.available !== false;
     return `
-      <div style="background:#FFFFFF; border:1px solid #EFEAE3; border-radius:16px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,0.03); ${!isAvailable ? 'background:#FAF8F5; opacity:0.88;' : ''}">
+      <div style="background:#FFFFFF; border:1px solid #EFEAE3; border-radius:14px; padding:10px 14px; display:flex; flex-direction:column; justify-content:space-between; gap:8px; box-shadow:0 3px 10px rgba(0,0,0,0.03); ${!isAvailable ? 'background:#FAF8F5; opacity:0.88;' : ''}">
         
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          <div style="width:58px; height:58px; border-radius:12px; overflow:hidden; background:#FAF7F2; flex-shrink:0; position:relative;">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <div style="width:50px; height:50px; border-radius:10px; overflow:hidden; background:#FAF7F2; flex-shrink:0; position:relative;">
             ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);font-size:0.75rem;">FRZ</div>`}
-            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px; left:2px; width:14px; height:14px;"></span>
+            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px; left:2px; width:12px; height:12px;"></span>
           </div>
 
           <div style="flex:1;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
-              <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--gold); text-transform:uppercase;">${item.category}</span>
+              <span style="font-family:var(--font-mono); font-size:0.65rem; font-weight:700; color:var(--gold); text-transform:uppercase;">${item.category}</span>
               <button onclick="toggleItemVeg(${item.id})" title="Click to toggle Veg/Non-Veg" style="border:none; background:transparent; cursor:pointer; font-size:0.75rem; padding:0;">
-                ${item.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
+                ${item.isVeg ? '● Veg' : '▲ Non-Veg'}
               </button>
             </div>
-            <div style="font-family:var(--font-serif); font-size:0.98rem; font-weight:700; color:var(--ink); margin:2px 0;">${item.name}</div>
-            <div style="font-size:0.78rem; color:var(--ink-soft); line-height:1.3; max-height:2.6em; overflow:hidden; text-overflow:ellipsis;">${item.description || 'No description'}</div>
+            <div style="font-family:var(--font-serif); font-size:0.92rem; font-weight:700; color:var(--ink); margin:1px 0;">${item.name}</div>
+            <div style="font-size:0.75rem; color:var(--ink-soft); line-height:1.2; max-height:2.4em; overflow:hidden; text-overflow:ellipsis;">${item.description || 'No description'}</div>
           </div>
         </div>
 
-        <!-- CONTROLS ROW: PRICE EDIT, AVAILABILITY TOGGLE, EDIT & DELETE -->
-        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:10px; gap:6px; flex-wrap:wrap;">
-          <div style="display:flex; align-items:center; gap:3px; font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#6B3A2A;">
-            <span>₹</span>
-            <input type="number" min="1" value="${item.price}" onchange="updateItemPrice(${item.id}, this.value)" 
-                   style="width:68px; padding:3px 5px; border:1px solid #EFEAE3; border-radius:6px; font-family:var(--font-mono); font-weight:700; font-size:0.85rem; color:#6B3A2A; outline:none; background:#FAF7F2;" />
+        <!-- CONTROLS ROW: STATIC PRICE, AVAILABILITY TOGGLE, EDIT & DELETE -->
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:8px; gap:6px; flex-wrap:wrap;">
+          <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#6B3A2A;">
+            ₹${item.price}
           </div>
 
           <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
             <button onclick="toggleItemAvailability(${item.id})" 
-                    style="padding:5px 12px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
-              ${isAvailable ? '✓ Available' : '✕ Unavailable'}
+                    style="padding:4px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.74rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
+              ${isAvailable ? 'Available' : 'Unavailable'}
             </button>
 
             <button onclick="openEditItemModal(${item.id})" title="Edit full details & Bestseller tag"
-                    style="padding:5px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; background:#E3F2FD; color:#1565C0; border:1px solid #BBDEFB; cursor:pointer; transition:all 0.2s ease;">
-              ✏️ Edit
+                    style="padding:4px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.74rem; font-weight:700; background:#E3F2FD; color:#1565C0; border:1px solid #BBDEFB; cursor:pointer; transition:all 0.2s ease;">
+              Edit
             </button>
 
             <button onclick="deleteMenuItem(${item.id})" title="Delete item"
-                    style="padding:5px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.76rem; font-weight:700; background:#FFF3E0; color:#E65100; border:1px solid #FFE0B2; cursor:pointer; transition:all 0.2s ease;">
-              🗑 Delete
+                    style="padding:4px 10px; border-radius:9999px; font-family:var(--font-sans); font-size:0.74rem; font-weight:700; background:#FFF3E0; color:#E65100; border:1px solid #FFE0B2; cursor:pointer; transition:all 0.2s ease;">
+              Delete
             </button>
           </div>
         </div>
