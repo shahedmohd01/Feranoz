@@ -329,7 +329,19 @@ function printReceipt(orderId) {
 let ownerActiveCat = 'all';
 let ownerSearchQuery = '';
 
+function toggleOwnerMobileNav() {
+  const menu = document.getElementById('owner-nav-menu');
+  const btn = document.getElementById('owner-hamburger');
+  if (menu) menu.classList.toggle('open');
+  if (btn) btn.classList.toggle('active');
+}
+
 function showDashboardView(view) {
+  const menu = document.getElementById('owner-nav-menu');
+  const btn = document.getElementById('owner-hamburger');
+  if (menu) menu.classList.remove('open');
+  if (btn) btn.classList.remove('active');
+
   const ordersSec = document.getElementById('view-orders-section');
   const menuSec = document.getElementById('view-menu-section');
   if (!ordersSec || !menuSec) return;

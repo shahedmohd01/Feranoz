@@ -60,9 +60,9 @@
 }
 
 .modal-header {
-  padding: 0 20px;
-  height: 60px;
-  min-height: 60px;
+  padding: 0 16px;
+  height: 64px;
+  min-height: 64px;
   border-bottom: 1px solid #EFEAE3;
   display: flex;
   justify-content: space-between;
@@ -73,13 +73,17 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  gap: 12px;
 }
 
 .modal-header h3 {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--ink);
+  margin: 0;
+  text-align: center;
+  flex: 1;
 }
 
 .modal-close-btn {
@@ -471,29 +475,40 @@
   }
 
   .modal-header {
-    padding: 0 12px;
-    height: 54px;
-    min-height: 54px;
+    padding: 10px 16px;
+    height: auto;
+    min-height: 56px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
     width: 100%;
     box-sizing: border-box;
+    border-bottom: 1px solid #EFEAE3;
+    background: #FFFFFF;
   }
 
   .modal-header h3 {
-    font-size: 0.95rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .modal-header div:last-child {
-    display: none;
+    font-size: 1.05rem;
+    order: 3;
+    width: 100%;
+    text-align: center;
+    margin-top: 2px;
   }
 
   .modal-back-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
+    order: 1;
+    padding: 6px 14px;
+    font-size: 0.82rem;
     min-width: auto;
+  }
+
+  #location-banner {
+    order: 2;
+    padding: 6px 12px;
+    font-size: 0.74rem;
+    border-radius: 9999px;
   }
 
   .modal-body {
@@ -504,7 +519,7 @@
     gap: 0;
     width: 100%;
     max-width: 100vw;
-    height: calc(100vh - 54px);
+    height: calc(100vh - 56px);
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -515,7 +530,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 14px 12px;
+    padding: 16px;
     width: 100%;
     max-width: 100vw;
     height: auto;
@@ -533,7 +548,7 @@
 
   .table-btn {
     padding: 10px 4px;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 700;
     white-space: nowrap;
     text-align: center;
@@ -568,6 +583,7 @@
     max-height: none;
     overflow-x: hidden;
     width: 100%;
+    padding-bottom: 20px;
     box-sizing: border-box;
   }
 
@@ -580,12 +596,13 @@
   }
 
   .modal-right {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     width: 100%;
     max-width: 100vw;
-    padding: 16px 12px 24px 12px;
+    padding: 18px 16px 30px 16px;
     border-radius: 0;
     border-left: none;
     border-top: 2px solid #EFEAE3;
@@ -606,6 +623,10 @@
 @media (max-width: 400px) {
   .table-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .modal-header {
+    padding: 8px 12px;
   }
 }
 
