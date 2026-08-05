@@ -313,7 +313,10 @@ function printReceipt(orderId) {
   `);
 }
 
-// ── Inline Owner View Switcher ────────────────────────────────
+// ── Inline Owner Menu Management System ────────────────────────
+let ownerActiveCat = 'all';
+let ownerSearchQuery = '';
+
 function showDashboardView(view) {
   const ordersSec = document.getElementById('view-orders-section');
   const menuSec = document.getElementById('view-menu-section');
@@ -322,6 +325,7 @@ function showDashboardView(view) {
   if (view === 'menu') {
     ordersSec.style.display = 'none';
     menuSec.style.display = 'block';
+    renderOwnerMenuCatTabs();
     renderOwnerMenuManagement();
   } else {
     menuSec.style.display = 'none';
@@ -329,26 +333,180 @@ function showDashboardView(view) {
   }
 }
 
+function renderOwnerMenuCatTabs() {
+  const container = document.getElementById('owner-menu-cat-tabs');
+  if (!container || typeof CATEGORIES === 'undefined') return;
+
+  const activeCategories = typeof getMenuCategories === 'function' ? getMenuCategories() : CATEGORIES;
+
+  container.innerHTML = activeCategories.map(cat => `
+    <button class="filter-tab-btn ${cat.id === ownerActiveCat ? 'active' : ''}" 
+            onclick="selectOwnerMenuCat('${cat.id}', this)">
+      ${cat.label}
+    </button>
+  `).join('');
+}
+
+function selectOwnerMenuCat(catId, btnEl) {
+  ownerActiveCat = catId;
+  if (btnEl) {
+    document.querySelectorAll('#owner-menu-cat-tabs .filter-tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+  renderOwnerMenuManagement();
+}
+
+function filterOwnerMenu(query) {
+  ownerSearchQuery = query;
+  renderOwnerMenuManagement();
+}
+
 function renderOwnerMenuManagement() {
   const container = document.getElementById('owner-menu-grid');
   if (!container || typeof MENU_DATA === 'undefined') return;
 
-  container.innerHTML = MENU_DATA.map(item => `
-    <div style="background:#FFFFFF; border:1px solid #EFEAE3; border-radius:16px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:10px; box-shadow:0 4px 14px rgba(0,0,0,0.03);">
-      <div style="display:flex; gap:12px; align-items:center;">
-        <div style="width:54px; height:54px; border-radius:12px; overflow:hidden; background:#FAF7F2; flex-shrink:0;">
-          ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" />` : ''}
-        </div>
-        <div>
-          <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--gold); text-transform:uppercase;">${item.category}</span>
-          <div style="font-family:var(--font-serif); font-size:0.95rem; font-weight:700; color:var(--ink);">${item.name}</div>
-          <span style="font-family:var(--font-mono); font-size:0.88rem; font-weight:700; color:#6B3A2A;">₹${item.price}</span>
-        </div>
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  let filtered = allItems;
+
+  if (ownerActiveCat !== 'all') {
+    filtered = filtered.filter(i => i.category === ownerActiveCat);
+  }
+
+  if (ownerSearchQuery.trim()) {
+    const q = ownerSearchQuery.toLowerCase().trim();
+    filtered = filtered.filter(i => i.name.toLowerCase().includes(q) || (i.description || '').toLowerCase().includes(q));
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:50px; background:#FFFFFF; border:1px solid #EFEAE3; border-radius:16px;">
+        <h3 style="font-family:var(--font-serif); color:var(--ink);">No items found</h3>
+        <p style="color:var(--ink-soft); font-size:0.9rem;">Try selecting a different category or search term.</p>
       </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:8px;">
-        <span style="font-size:0.78rem; font-weight:600; color:${item.isVeg ? '#2E7D32' : '#C62828'};">${item.isVeg ? '● Veg' : '▲ Non-Veg'}</span>
-        <button style="padding:4px 12px; border-radius:9999px; background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9; font-size:0.76rem; font-weight:700; cursor:pointer;">Available</button>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => {
+    const isAvailable = item.available !== false;
+    return `
+      <div style="background:#FFFFFF; border:1px solid #EFEAE3; border-radius:16px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,0.03); ${!isAvailable ? 'background:#FAF8F5; opacity:0.88;' : ''}">
+        
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:58px; height:58px; border-radius:12px; overflow:hidden; background:#FAF7F2; flex-shrink:0; position:relative;">
+            ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);font-size:0.75rem;">FRZ</div>`}
+            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px; left:2px; width:14px; height:14px;"></span>
+          </div>
+
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+              <span style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:var(--gold); text-transform:uppercase;">${item.category}</span>
+              <button onclick="toggleItemVeg(${item.id})" title="Click to toggle Veg/Non-Veg" style="border:none; background:transparent; cursor:pointer; font-size:0.75rem; padding:0;">
+                ${item.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
+              </button>
+            </div>
+            <div style="font-family:var(--font-serif); font-size:0.98rem; font-weight:700; color:var(--ink); margin:2px 0;">${item.name}</div>
+            <div style="font-size:0.78rem; color:var(--ink-soft); line-height:1.3; max-height:2.6em; overflow:hidden; text-overflow:ellipsis;">${item.description || 'No description'}</div>
+          </div>
+        </div>
+
+        <!-- CONTROLS ROW: PRICE EDIT & AVAILABILITY TOGGLE -->
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:10px; gap:8px;">
+          <div style="display:flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:0.85rem; font-weight:700; color:#6B3A2A;">
+            <span>₹</span>
+            <input type="number" min="1" value="${item.price}" onchange="updateItemPrice(${item.id}, this.value)" 
+                   style="width:72px; padding:3px 6px; border:1px solid #EFEAE3; border-radius:6px; font-family:var(--font-mono); font-weight:700; font-size:0.85rem; color:#6B3A2A; outline:none; background:#FAF7F2;" />
+          </div>
+
+          <button onclick="toggleItemAvailability(${item.id})" 
+                  style="padding:6px 14px; border-radius:9999px; font-family:var(--font-sans); font-size:0.78rem; font-weight:700; border:none; cursor:pointer; transition:all 0.2s ease; ${isAvailable ? 'background:#E8F5E9; color:#2E7D32; border:1px solid #C8E6C9;' : 'background:#FFEBEE; color:#C62828; border:1px solid #FFCDD2;'}">
+            ${isAvailable ? '✓ Available' : '✕ Unavailable'}
+          </button>
+        </div>
+
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+}
+
+// ── Item Actions: Toggle Availability, Update Price, Toggle Veg ──
+function toggleItemAvailability(itemId) {
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const target = allItems.find(i => i.id === itemId);
+  if (target) {
+    target.available = target.available === false ? true : false;
+    saveActiveMenuData(allItems);
+    renderOwnerMenuManagement();
+  }
+}
+
+function updateItemPrice(itemId, newPrice) {
+  const priceVal = parseInt(newPrice, 10);
+  if (isNaN(priceVal) || priceVal <= 0) return;
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const target = allItems.find(i => i.id === itemId);
+  if (target) {
+    target.price = priceVal;
+    saveActiveMenuData(allItems);
+  }
+}
+
+function toggleItemVeg(itemId) {
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const target = allItems.find(i => i.id === itemId);
+  if (target) {
+    target.isVeg = !target.isVeg;
+    saveActiveMenuData(allItems);
+    renderOwnerMenuManagement();
+  }
+}
+
+// ── Add New Item Modal Actions ────────────────────────────────
+function openAddItemModal() {
+  const overlay = document.getElementById('add-item-modal-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function closeAddItemModal() {
+  const overlay = document.getElementById('add-item-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function submitNewMenuItem(event) {
+  if (event) event.preventDefault();
+
+  const nameEl = document.getElementById('new-item-name');
+  const catEl  = document.getElementById('new-item-category');
+  const priceEl = document.getElementById('new-item-price');
+  const isVegEl = document.getElementById('new-item-isveg');
+  const descEl  = document.getElementById('new-item-desc');
+  const imgEl   = document.getElementById('new-item-image');
+
+  if (!nameEl || !priceEl) return;
+
+  const newItem = {
+    id: Date.now(),
+    name: nameEl.value.trim(),
+    category: catEl ? catEl.value : 'desserts',
+    price: parseInt(priceEl.value, 10) || 100,
+    isVeg: isVegEl ? isVegEl.value === 'true' : true,
+    description: descEl ? descEl.value.trim() : '',
+    image: imgEl && imgEl.value.trim() ? imgEl.value.trim() : '',
+    popular: false,
+    available: true
+  };
+
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  allItems.unshift(newItem);
+  saveActiveMenuData(allItems);
+
+  closeAddItemModal();
+  renderOwnerMenuCatTabs();
+  renderOwnerMenuManagement();
+  
+  // Reset form
+  nameEl.value = '';
+  priceEl.value = '';
+  if (descEl) descEl.value = '';
+  if (imgEl) imgEl.value = '';
 }

@@ -353,9 +353,12 @@
     const container = document.getElementById('full-menu-sections');
     if (!container || typeof MENU_DATA === 'undefined') return;
 
+    const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+    const categories = typeof getMenuCategories === 'function' ? getMenuCategories() : CATEGORIES;
+
     let html = '';
-    CATEGORIES.filter(c => c.id !== 'all').forEach(cat => {
-      let items = MENU_DATA.filter(i => i.category === cat.id);
+    categories.filter(c => c.id !== 'all').forEach(cat => {
+      let items = allItems.filter(i => i.category === cat.id);
       if (query.trim()) {
         const q = query.toLowerCase();
         items = items.filter(i => i.name.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
@@ -368,26 +371,31 @@
             <h2>${cat.label}</h2>
           </div>
           <div class="menu-preview-grid">
-            ${items.map(item => `
-              <div class="caffeine-item-card" data-category="${item.category}" data-id="${item.id}">
-                <div class="card-img-wrap">
-                  <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
-                  ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
-                  ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
-                </div>
-                <div>
-                  <div class="card-title-row">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                      <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
-                      <h3 class="card-title">${item.name}</h3>
-                    </div>
-                    <span class="card-price">₹${item.price}</span>
+            ${items.map(item => {
+              const isAvailable = item.available !== false;
+              return `
+                <div class="caffeine-item-card ${!isAvailable ? 'item-unavailable' : ''}" data-category="${item.category}" data-id="${item.id}">
+                  <div class="card-img-wrap" style="${!isAvailable ? 'filter: grayscale(80%); opacity:0.8;' : ''}">
+                    <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
+                    ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
+                    ${!isAvailable ? `<span class="card-bestseller-badge" style="background:#C62828;">UNAVAILABLE</span>` : (item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : '')}
                   </div>
-                  <p class="card-desc">${item.description}</p>
+                  <div>
+                    <div class="card-title-row">
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
+                        <h3 class="card-title">${item.name}</h3>
+                      </div>
+                      <span class="card-price">₹${item.price}</span>
+                    </div>
+                    <p class="card-desc">${item.description}</p>
+                  </div>
+                  <button class="card-action-btn" ${!isAvailable ? 'disabled style="opacity:0.55; cursor:not-allowed; background:#8D6E63;"' : 'onclick="openOrderModal()"'}>
+                    ${isAvailable ? 'Order Item' : 'Currently Unavailable'}
+                  </button>
                 </div>
-                <button class="card-action-btn" onclick="openOrderModal()">Order Item</button>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -400,6 +408,24 @@
   function handleMenuSearch(val) {
     renderFullMenuSections(val);
   }
+
+  // ── Real-Time Menu Sync Listeners ─────────────────────────────
+  try {
+    const mChannel = new BroadcastChannel('feranoz_menu_channel');
+    mChannel.onmessage = (e) => {
+      if (e.data && e.data.type === 'MENU_UPDATED') {
+        renderFullMenuSections();
+        renderCategoryNavLinks();
+      }
+    };
+  } catch(e) {}
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'feranoz_custom_menu') {
+      renderFullMenuSections();
+      renderCategoryNavLinks();
+    }
+  });
 </script>
 </body>
 </html>

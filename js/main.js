@@ -215,12 +215,13 @@ function renderMenuPreview(category = 'all') {
   const container = document.getElementById('menu-preview-grid');
   if (!container || typeof MENU_DATA === 'undefined') return;
 
-  let items = MENU_DATA;
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  let items = allItems;
   if (category !== 'all') {
-    items = MENU_DATA.filter(i => i.category === category);
+    items = allItems.filter(i => i.category === category);
   } else {
     const featuredSet = new Set(FEATURED_IDS || [101, 102, 103, 105, 401, 601]);
-    items = MENU_DATA.filter(i => featuredSet.has(i.id));
+    items = allItems.filter(i => featuredSet.has(i.id));
   }
 
   if (items.length === 0) {
@@ -228,31 +229,50 @@ function renderMenuPreview(category = 'all') {
     return;
   }
 
-  container.innerHTML = items.map(item => `
-    <div class="caffeine-item-card" data-category="${item.category}" data-id="${item.id}">
-      <div class="card-img-wrap">
-        <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
-        ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
-        ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
-      </div>
-
-      <div>
-        <div class="card-title-row">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
-            <h3 class="card-title">${item.name}</h3>
-          </div>
-          <span class="card-price">₹${item.price}</span>
+  container.innerHTML = items.map(item => {
+    const isAvailable = item.available !== false;
+    return `
+      <div class="caffeine-item-card ${!isAvailable ? 'item-unavailable' : ''}" data-category="${item.category}" data-id="${item.id}">
+        <div class="card-img-wrap" style="${!isAvailable ? 'filter: grayscale(80%); opacity:0.8;' : ''}">
+          <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
+          ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" data-name="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
+          ${!isAvailable ? `<span class="card-bestseller-badge" style="background:#C62828;">UNAVAILABLE</span>` : (item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : '')}
         </div>
-        <p class="card-desc">${item.description}</p>
-      </div>
 
-      <button class="card-action-btn" onclick="openOrderModal(); return false;">
-        Order Item
-      </button>
-    </div>
-  `).join('');
+        <div>
+          <div class="card-title-row">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
+              <h3 class="card-title">${item.name}</h3>
+            </div>
+            <span class="card-price">₹${item.price}</span>
+          </div>
+          <p class="card-desc">${item.description}</p>
+        </div>
+
+        <button class="card-action-btn" ${!isAvailable ? 'disabled style="opacity:0.55; cursor:not-allowed; background:#8D6E63;"' : 'onclick="openOrderModal(); return false;"'}>
+          ${isAvailable ? 'Order Item' : 'Currently Unavailable'}
+        </button>
+      </div>
+    `;
+  }).join('');
 }
+
+// ── Real-Time Menu Sync Listener ──────────────────────────────
+try {
+  const menuBc = new BroadcastChannel('feranoz_menu_channel');
+  menuBc.onmessage = (e) => {
+    if (e.data && e.data.type === 'MENU_UPDATED') {
+      renderMenuPreview();
+    }
+  };
+} catch(err) {}
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'feranoz_custom_menu') {
+    renderMenuPreview();
+  }
+});
 
 function checkTableQueryParam() {
   const params = new URLSearchParams(window.location.search);

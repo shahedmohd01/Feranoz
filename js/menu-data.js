@@ -1185,3 +1185,34 @@ const FEATURED_IDS = [
   160,
   169
 ];
+
+// ── Active Custom Menu State & Persistence Helper Functions ───
+function getActiveMenuData() {
+  const customStr = localStorage.getItem('feranoz_custom_menu');
+  if (customStr) {
+    try {
+      const parsed = JSON.parse(customStr);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch(e) {}
+  }
+  // Initialize default menu with available = true
+  const initial = MENU_DATA.map(item => ({ ...item, available: item.available !== false }));
+  localStorage.setItem('feranoz_custom_menu', JSON.stringify(initial));
+  return initial;
+}
+
+function saveActiveMenuData(dataList) {
+  localStorage.setItem('feranoz_custom_menu', JSON.stringify(dataList));
+  try {
+    const bc = new BroadcastChannel('feranoz_menu_channel');
+    bc.postMessage({ type: 'MENU_UPDATED' });
+  } catch(e) {}
+}
+
+function getMenuCategories() {
+  const data = getActiveMenuData();
+  const catSet = new Set(data.map(i => i.category));
+  return CATEGORIES.filter(c => c.id === 'all' || catSet.has(c.id));
+}

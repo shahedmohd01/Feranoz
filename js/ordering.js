@@ -217,7 +217,8 @@ function renderMenuItems(catId = 'all', search = '') {
   const container = document.getElementById('menu-items-container');
   if (!container) return;
 
-  let items = catId === 'all' ? MENU_DATA : MENU_DATA.filter(m => m.category === catId);
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  let items = catId === 'all' ? allItems : allItems.filter(m => m.category === catId);
 
   if (search) {
     const q = search.toLowerCase();
@@ -236,25 +237,28 @@ function renderMenuItems(catId = 'all', search = '') {
     const cartItem = cart.find(c => c.id === item.id);
     const qty = cartItem ? cartItem.qty : 0;
     const inCart = qty > 0;
+    const isAvailable = item.available !== false;
 
     const imgThumb = item.image
-      ? `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(item.image)}" alt="${item.name}" style="width:52px;height:52px;border-radius:8px;object-fit:cover;display:block;" /><span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px;left:2px;width:14px;height:14px;"></span></div>`
+      ? `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(item.image)}" alt="${item.name}" style="width:52px;height:52px;border-radius:8px;object-fit:cover;display:block;${!isAvailable ? 'filter:grayscale(100%);opacity:0.6;' : ''}" /><span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px;left:2px;width:14px;height:14px;"></span></div>`
       : `<div style="position:relative;flex-shrink:0;width:52px;height:52px;border-radius:8px;background:#FAF7F2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#2C1810;"><span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px;left:2px;width:14px;height:14px;"></span>FRZ</div>`;
 
     return `
-      <div class="menu-item-row ${inCart ? 'in-cart' : ''}" id="menu-item-row-${item.id}">
+      <div class="menu-item-row ${inCart ? 'in-cart' : ''} ${!isAvailable ? 'item-unavailable' : ''}" id="menu-item-row-${item.id}" style="${!isAvailable ? 'opacity:0.65; background:#FAFAFA;' : ''}">
         ${imgThumb}
         <div class="menu-item-info">
           <div class="menu-item-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static;flex-shrink:0;width:14px;height:14px;"></span>
             <span>${item.name}</span>
-            ${item.popular ? '<span class="badge-popular">BESTSELLER</span>' : ''}
+            ${!isAvailable ? '<span class="badge-popular" style="background:#C62828;">UNAVAILABLE</span>' : (item.popular ? '<span class="badge-popular">BESTSELLER</span>' : '')}
           </div>
           <div class="menu-item-desc">${item.description}</div>
         </div>
         <div class="menu-item-right">
           <div class="menu-item-price">₹${item.price}</div>
-          ${inCart ? `
+          ${!isAvailable ? `
+            <button class="btn-add-cart" disabled style="opacity:0.5; background:#8D6E63; cursor:not-allowed; padding:4px 10px; font-size:0.75rem;">Unavailable</button>
+          ` : (inCart ? `
             <div class="qty-control">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
               <span class="qty-display">${qty}</span>
@@ -262,7 +266,7 @@ function renderMenuItems(catId = 'all', search = '') {
             </div>
           ` : `
             <button class="btn-add-cart" onclick="addToCart(${item.id})">+ Add</button>
-          `}
+          `)}
         </div>
       </div>
     `;
@@ -271,8 +275,9 @@ function renderMenuItems(catId = 'all', search = '') {
 
 // ── Cart Operations ───────────────────────────────────────────
 function addToCart(itemId) {
-  const item = MENU_DATA.find(m => m.id === itemId);
-  if (!item) return;
+  const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
+  const item = allItems.find(m => m.id === itemId);
+  if (!item || item.available === false) return;
 
   const existing = cart.find(c => c.id === itemId);
   if (existing) {

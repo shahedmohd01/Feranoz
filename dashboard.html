@@ -464,17 +464,101 @@
         </button>
         <span class="section-tag">Kitchen Inventory</span>
         <h1 style="font-size: 2.2rem;">Owner Menu Management</h1>
-        <p style="color:var(--ink-soft); font-size:0.92rem;">Direct owner view of kitchen menu items & availability</p>
+        <p style="color:var(--ink-soft); font-size:0.92rem;">Direct owner controls for pricing, live availability & new items</p>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn-primary" onclick="openAddItemModal()" style="font-size:0.85rem; padding:10px 20px;">
+          + Add New Item
+        </button>
       </div>
     </div>
 
+    <!-- OWNER MENU CONTROLS & CATEGORIES BAR -->
+    <div class="dash-controls-bar" style="margin-top:16px;">
+      <div class="filter-tabs" id="owner-menu-cat-tabs">
+        <!-- Category filter pills rendered by JS -->
+      </div>
+      <input type="text" id="owner-menu-search" placeholder="Search menu items..." 
+             style="border:1px solid #EFEAE3; border-radius:9999px; padding:6px 14px; font-size:0.84rem; outline:none; min-width:200px;" 
+             oninput="filterOwnerMenu(this.value)" />
+    </div>
+
     <!-- Menu Items Grid Container -->
-    <div id="owner-menu-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:18px; margin-top:20px;">
+    <div id="owner-menu-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:18px; margin-top:20px;">
       <!-- Populated by JS -->
     </div>
   </div>
 
 </main>
+
+<!-- ADD NEW ITEM MODAL -->
+<div class="auth-modal-overlay" id="add-item-modal-overlay" style="display:none;">
+  <div class="auth-modal-box" style="max-width:520px; text-align:left; padding:28px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h3 style="font-family:var(--font-serif); font-size:1.4rem; font-weight:700; color:var(--ink); margin:0;">+ Add New Menu Item</h3>
+      <button onclick="closeAddItemModal()" style="background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--ink-soft);">✕</button>
+    </div>
+
+    <form onsubmit="submitNewMenuItem(event)">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">ITEM NAME *</label>
+          <input type="text" id="new-item-name" required placeholder="e.g. Pistachio Croissant" class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;" />
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">CATEGORY *</label>
+          <select id="new-item-category" required class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;">
+            <option value="desserts">Desserts & Pastries</option>
+            <option value="cakes">Cakes</option>
+            <option value="croissants">Croissants & Rolls</option>
+            <option value="pizza">Gourmet Pizzas</option>
+            <option value="burger">Burgers</option>
+            <option value="pasta">Pastas</option>
+            <option value="grilled-sandwich">Grilled Sandwiches</option>
+            <option value="croissant-sandwich">Croissant Sandwiches</option>
+            <option value="hot-beverages">Hot Beverages</option>
+            <option value="cold-blends">Cold Blends & Coffee</option>
+            <option value="quenchers">Quenchers & Cold Teas</option>
+            <option value="iced-coffee">Iced Coffees</option>
+            <option value="appetizers">Appetizers</option>
+            <option value="wraps">Wraps</option>
+            <option value="calzone">Calzone</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">PRICE (₹) *</label>
+          <input type="number" id="new-item-price" required min="1" placeholder="e.g. 290" class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;" />
+        </div>
+        <div>
+          <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">FOOD TYPE *</label>
+          <select id="new-item-isveg" required class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;">
+            <option value="true">🟢 Vegetarian</option>
+            <option value="false">🔴 Non-Vegetarian</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">DESCRIPTION</label>
+        <textarea id="new-item-desc" rows="2" placeholder="Brief delicious description of hand-crafted dish..." class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem; font-family:inherit; resize:vertical;"></textarea>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="font-size:0.78rem; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:4px;">IMAGE URL / PATH</label>
+        <input type="text" id="new-item-image" placeholder="images/menu/Desserts/Pistachio Croissant.png" class="auth-pass-input" style="padding:8px 12px; font-size:0.88rem;" />
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" onclick="closeAddItemModal()" class="btn-outline" style="flex:1;">Cancel</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Add Item to Live Menu</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer id="footer">
