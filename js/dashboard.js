@@ -351,7 +351,13 @@ function renderOwnerMenuCatTabs() {
 
   const activeCategories = typeof getMenuCategories === 'function' ? getMenuCategories() : CATEGORIES;
 
-  container.innerHTML = activeCategories.map(cat => `
+  const tabs = [
+    { id: 'all', label: 'All Items' },
+    { id: 'bestseller', label: '⭐ Bestsellers' },
+    ...activeCategories.filter(c => c.id !== 'all')
+  ];
+
+  container.innerHTML = tabs.map(cat => `
     <button class="filter-tab-btn ${cat.id === ownerActiveCat ? 'active' : ''}" 
             onclick="selectOwnerMenuCat('${cat.id}', this)">
       ${cat.label}
@@ -380,7 +386,9 @@ function renderOwnerMenuManagement() {
   const allItems = typeof getActiveMenuData === 'function' ? getActiveMenuData() : MENU_DATA;
   let filtered = allItems;
 
-  if (ownerActiveCat !== 'all') {
+  if (ownerActiveCat === 'bestseller') {
+    filtered = filtered.filter(i => i.popular === true);
+  } else if (ownerActiveCat !== 'all') {
     filtered = filtered.filter(i => i.category === ownerActiveCat);
   }
 

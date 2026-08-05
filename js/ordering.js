@@ -135,10 +135,11 @@ let activeCat = 'all';
 
 function renderCategoryTabs() {
   const container = document.getElementById('category-tabs');
-  if (!container) return;
+  if (!container || typeof CATEGORIES === 'undefined') return;
 
   container.innerHTML = CATEGORIES.map(cat => `
     <button class="cat-tab ${cat.id === activeCat ? 'active' : ''}"
+            data-cat-id="${cat.id}"
             onclick="switchCategory('${cat.id}')">
       ${cat.label}
     </button>
@@ -207,7 +208,7 @@ function enableTabsMouseSwipe(bar) {
 function switchCategory(catId) {
   activeCat = catId;
   document.querySelectorAll('.cat-tab').forEach(t => {
-    t.classList.toggle('active', t.textContent.trim() === (CATEGORIES.find(c => c.id === catId)?.label || ''));
+    t.classList.toggle('active', t.getAttribute('data-cat-id') === catId);
   });
   renderMenuItems(catId, document.getElementById('menu-search')?.value || '');
 }
