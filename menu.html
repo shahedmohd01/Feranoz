@@ -33,10 +33,10 @@
       max-width: 1060px;
       margin: 0 auto 30px;
       border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(28px) saturate(220%);
       -webkit-backdrop-filter: blur(28px) saturate(220%);
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.95);
       box-shadow: 0 14px 36px rgba(44, 24, 16, 0.08);
       transition: all 0.3s ease;
     }
@@ -46,10 +46,19 @@
       gap: 10px;
       overflow-x: auto;
       white-space: nowrap;
-      justify-content: center;
+      justify-content: flex-start;
+      align-items: center;
       padding: 4px 6px;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      scroll-behavior: smooth;
+    }
+
+    .sticky-cat-inner:active {
+      cursor: grabbing;
     }
 
     .sticky-cat-inner::-webkit-scrollbar {
@@ -210,7 +219,62 @@
   document.addEventListener('DOMContentLoaded', () => {
     renderFullMenuSections();
     renderCategoryNavLinks();
+    initCatNavMouseSwipe();
   });
+
+  function initCatNavMouseSwipe() {
+    const nav = document.getElementById('category-nav-links');
+    if (!nav) return;
+
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let isDragging = false;
+
+    nav.addEventListener('mousedown', (e) => {
+      isDown = true;
+      isDragging = false;
+      nav.style.cursor = 'grabbing';
+      startX = e.pageX - nav.offsetLeft;
+      scrollLeft = nav.scrollLeft;
+    });
+
+    nav.addEventListener('mouseleave', () => {
+      isDown = false;
+      nav.style.cursor = 'grab';
+    });
+
+    nav.addEventListener('mouseup', () => {
+      isDown = false;
+      nav.style.cursor = 'grab';
+      setTimeout(() => { isDragging = false; }, 50);
+    });
+
+    nav.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - nav.offsetLeft;
+      const walk = (x - startX) * 1.8;
+      if (Math.abs(walk) > 5) {
+        isDragging = true;
+      }
+      nav.scrollLeft = scrollLeft - walk;
+    });
+
+    nav.addEventListener('click', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+    nav.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        nav.scrollLeft += e.deltaY * 0.8;
+      }
+    }, { passive: false });
+  }
 
   function renderCategoryNavLinks() {
     const nav = document.getElementById('category-nav-links');
@@ -233,7 +297,10 @@
     window.scrollTo({ top: targetPos, behavior: 'smooth' });
 
     document.querySelectorAll('.sticky-cat-inner .cat-pill-btn').forEach(b => b.classList.remove('active'));
-    if (btnEl) btnEl.classList.add('active');
+    if (btnEl) {
+      btnEl.classList.add('active');
+      btnEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
   }
 
   function renderFullMenuSections(query = '') {
@@ -258,12 +325,16 @@
             ${items.map(item => `
               <div class="caffeine-item-card">
                 <div class="card-img-wrap">
+                  <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
                   ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
                   ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
                 </div>
                 <div>
                   <div class="card-title-row">
-                    <h3 class="card-title">${item.name}</h3>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
+                      <h3 class="card-title">${item.name}</h3>
+                    </div>
                     <span class="card-price">₹${item.price}</span>
                   </div>
                   <p class="card-desc">${item.description}</p>

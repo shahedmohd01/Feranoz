@@ -143,6 +143,65 @@ function renderCategoryTabs() {
       ${cat.label}
     </button>
   `).join('');
+
+  enableTabsMouseSwipe(container);
+}
+
+function enableTabsMouseSwipe(bar) {
+  if (bar.dataset.swipeEnabled) return;
+  bar.dataset.swipeEnabled = 'true';
+
+  let isDown = false;
+  let startX = 0;
+  let scrollLeft = 0;
+  let isDragging = false;
+
+  bar.style.cursor = 'grab';
+  bar.style.userSelect = 'none';
+
+  bar.addEventListener('mousedown', (e) => {
+    isDown = true;
+    isDragging = false;
+    bar.style.cursor = 'grabbing';
+    startX = e.pageX - bar.offsetLeft;
+    scrollLeft = bar.scrollLeft;
+  });
+
+  bar.addEventListener('mouseleave', () => {
+    isDown = false;
+    bar.style.cursor = 'grab';
+  });
+
+  bar.addEventListener('mouseup', () => {
+    isDown = false;
+    bar.style.cursor = 'grab';
+    setTimeout(() => { isDragging = false; }, 50);
+  });
+
+  bar.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - bar.offsetLeft;
+    const walk = (x - startX) * 1.8;
+    if (Math.abs(walk) > 5) {
+      isDragging = true;
+    }
+    bar.scrollLeft = scrollLeft - walk;
+  });
+
+  bar.addEventListener('click', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  bar.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      bar.scrollLeft += e.deltaY * 0.8;
+    }
+  }, { passive: false });
 }
 
 function switchCategory(catId) {
@@ -179,17 +238,17 @@ function renderMenuItems(catId = 'all', search = '') {
     const inCart = qty > 0;
 
     const imgThumb = item.image
-      ? `<img src="${encodeURI(item.image)}" alt="${item.name}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;" />`
-      : `<div style="width:48px;height:48px;border-radius:8px;background:#FAF7F2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#2C1810;flex-shrink:0;">FRZ</div>`;
+      ? `<div style="position:relative;flex-shrink:0;"><img src="${encodeURI(item.image)}" alt="${item.name}" style="width:52px;height:52px;border-radius:8px;object-fit:cover;display:block;" /><span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px;left:2px;width:14px;height:14px;"></span></div>`
+      : `<div style="position:relative;flex-shrink:0;width:52px;height:52px;border-radius:8px;background:#FAF7F2;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:#2C1810;"><span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="top:2px;left:2px;width:14px;height:14px;"></span>FRZ</div>`;
 
     return `
       <div class="menu-item-row ${inCart ? 'in-cart' : ''}" id="menu-item-row-${item.id}">
         ${imgThumb}
         <div class="menu-item-info">
-          <div class="menu-item-name">
-            ${item.name}
+          <div class="menu-item-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static;flex-shrink:0;width:14px;height:14px;"></span>
+            <span>${item.name}</span>
             ${item.popular ? '<span class="badge-popular">BESTSELLER</span>' : ''}
-            ${item.rating ? `<span style="font-size:.72rem;color:#C9A84C;font-weight:600;">(${item.rating})</span>` : ''}
           </div>
           <div class="menu-item-desc">${item.description}</div>
         </div>

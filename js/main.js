@@ -10,32 +10,36 @@ let isTransitioning = false;
 // 4 EXCLUSIVE HIGH-RES BESTSELLER CAROUSEL BANNER SLIDES
 const SHOWCASE_ITEMS_3D = [
   {
-    id: 113,
+    id: 106,
     name: "Tiramisu",
-    price: 295,
-    img: "images/swiggy_items/tiramisu.jpg",
-    desc: "Classic Italian tiramisu with espresso & mascarpone cream"
+    price: 210,
+    img: "images/menu/Desserts/Tiramisu.png",
+    desc: "Coffee infused italian savoiardi biscuit assembled with italian mascarpone cream & cocoa powder",
+    isVeg: false
   },
   {
-    id: 103,
+    id: 112,
     name: "Chocolate Noir",
     price: 295,
-    img: "images/swiggy_items/chocolate_noir.jpg",
-    desc: "Belgian chocolate ganache, 70% dark chocolate cream & cocoa sponge"
+    img: "images/menu/Desserts/Chocolate Noir.png",
+    desc: "Chocolate sponge, 55% Belgian chocolate ganache, 70% chocolate cream, chocolate diplomat cream",
+    isVeg: false
   },
   {
-    id: 101,
+    id: 102,
     name: "Basque Cheesecake",
     price: 280,
-    img: "images/Basque Cheesecake.jpg",
-    desc: "Baked cheesecake with a caramelized exterior &amp; rich, creamy center"
+    img: "images/menu/Desserts/Basque Cheesecake.jpg",
+    desc: "Baked cheesecake with a caramelized exterior & rich, soft and creamy center",
+    isVeg: false
   },
   {
-    id: 301,
+    id: 147,
     name: "Crunchy Chicken Burger",
     price: 440,
-    img: "images/swiggy_items/crunchy_chicken_burger.jpg",
-    desc: "Crispy fried chicken patty, special mayo & toasted brioche bun"
+    img: "images/menu/Burger/Crunchy Chicken Burger.jpg",
+    desc: "Crispy fried chicken patty, special mayo, lettuce & brioche bun",
+    isVeg: false
   }
 ];
 
@@ -43,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavbar();
   init3DShowcase();
   renderMenuPreview('all');
+  initCategoryPillsMouseSwipe();
   initScrollReveal();
   checkTableQueryParam();
 });
@@ -226,13 +231,17 @@ function renderMenuPreview(category = 'all') {
   container.innerHTML = items.map(item => `
     <div class="caffeine-item-card">
       <div class="card-img-wrap">
+        <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" title="${item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}"></span>
         ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
         ${item.popular ? `<span class="card-bestseller-badge">BESTSELLER</span>` : ''}
       </div>
 
       <div>
         <div class="card-title-row">
-          <h3 class="card-title">${item.name}</h3>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="card-veg-badge ${item.isVeg ? 'veg' : 'non-veg'}" style="position:static; flex-shrink:0;"></span>
+            <h3 class="card-title">${item.name}</h3>
+          </div>
           <span class="card-price">₹${item.price}</span>
         </div>
         <p class="card-desc">${item.description}</p>
@@ -259,3 +268,61 @@ function checkTableQueryParam() {
     }
   }
 }
+
+function initCategoryPillsMouseSwipe() {
+  const bar = document.getElementById('category-pills-bar');
+  if (!bar) return;
+
+  let isDown = false;
+  let startX = 0;
+  let scrollLeft = 0;
+  let isDragging = false;
+
+  bar.style.cursor = 'grab';
+  bar.style.userSelect = 'none';
+
+  bar.addEventListener('mousedown', (e) => {
+    isDown = true;
+    isDragging = false;
+    bar.style.cursor = 'grabbing';
+    startX = e.pageX - bar.offsetLeft;
+    scrollLeft = bar.scrollLeft;
+  });
+
+  bar.addEventListener('mouseleave', () => {
+    isDown = false;
+    bar.style.cursor = 'grab';
+  });
+
+  bar.addEventListener('mouseup', () => {
+    isDown = false;
+    bar.style.cursor = 'grab';
+    setTimeout(() => { isDragging = false; }, 50);
+  });
+
+  bar.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - bar.offsetLeft;
+    const walk = (x - startX) * 1.8;
+    if (Math.abs(walk) > 5) {
+      isDragging = true;
+    }
+    bar.scrollLeft = scrollLeft - walk;
+  });
+
+  bar.addEventListener('click', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+
+  bar.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      bar.scrollLeft += e.deltaY * 0.8;
+    }
+  }, { passive: false });
+}
+
