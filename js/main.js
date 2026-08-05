@@ -100,8 +100,10 @@ function initNavbar() {
   });
 }
 
-// ── 3D Full Photo Stage Showcase (3 Bestseller Items Grid) ────
+// ── 3D Coverflow Bestseller Carousel ─────────────────────────
 let SHOWCASE_DATA = [];
+let touchStartX = 0;
+let touchEndX = 0;
 
 function init3DShowcase() {
   const track = document.getElementById('showcase-items-track');
@@ -112,17 +114,25 @@ function init3DShowcase() {
   let popularItems = allItems.filter(i => i.popular === true);
   
   if (popularItems.length === 0 && typeof SHOWCASE_ITEMS_3D !== 'undefined') {
-    popularItems = SHOWCASE_ITEMS_3D.map(i => ({ name: i.name, image: i.img, category: 'bestseller', price: i.price, description: i.desc }));
+    popularItems = SHOWCASE_ITEMS_3D.map(i => ({
+      name: i.name,
+      image: i.img,
+      category: i.category || 'bestseller',
+      price: i.price,
+      description: i.desc
+    }));
   }
 
-  // Strictly limit to 3 fixed items maximum
-  SHOWCASE_DATA = popularItems.slice(0, 3);
+  SHOWCASE_DATA = popularItems.slice(0, 6);
+  if (SHOWCASE_DATA.length === 0 && typeof SHOWCASE_ITEMS_3D !== 'undefined') {
+    SHOWCASE_DATA = SHOWCASE_ITEMS_3D;
+  }
 
   track.innerHTML = SHOWCASE_DATA.map((item, idx) => `
-    <div class="bestseller-card-col" id="showcase-item-${idx}" onclick="set3DIndex(${idx})" style="cursor:pointer;">
-      <div class="showcase-card-inner ${idx === current3DIndex ? 'active' : ''}">
+    <div class="bestseller-card-col showcase-3d-item" id="showcase-item-${idx}" onclick="handle3DCardClick(${idx})">
+      <div class="showcase-card-inner">
         <div class="showcase-card-img-wrap">
-          ${item.image ? `<img src="${encodeURI(item.image)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
+          ${item.image || item.img ? `<img src="${encodeURI(item.image || item.img)}" alt="${item.name}" loading="lazy" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-weight:700;color:var(--ink);">${item.name}</div>`}
           <span class="card-bestseller-badge">BESTSELLER</span>
         </div>
         <p class="bestseller-title">${item.name}</p>
@@ -136,63 +146,160 @@ function init3DShowcase() {
     `).join('');
   }
 
+  initTouchAndHoverEvents();
   update3DStage();
+  startAutoSlide();
+}
+
+function handle3DCardClick(idx) {
+  if (idx === current3DIndex) return;
+  set3DIndex(idx);
 }
 
 function set3DIndex(idx) {
   current3DIndex = idx;
   update3DStage();
-
-  const dots = document.querySelectorAll('.showcase-dot');
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === idx);
-  });
 }
 
-function update3DStage() {
-  const total = SHOWCASE_DATA.length;
-  if (total === 0) return;
-
-  SHOWCASE_DATA.forEach((_, idx) => {
-    const el = document.getElementById(`showcase-item-${idx}`);
-    if (!el) return;
-
-    const inner = el.querySelector('.showcase-card-inner');
-    if (inner) {
-      inner.classList.toggle('active', idx === current3DIndex);
-    }
-  });
-
-  const titleEl = document.getElementById('showcase-title');
-  const catEl   = document.getElementById('showcase-category');
-  const infoBar = document.getElementById('showcase-info-bar');
-
-  const activeItem = SHOWCASE_DATA[current3DIndex];
-  if (activeItem) {
-    if (titleEl) titleEl.textContent = activeItem.name;
-    if (catEl) catEl.textContent = (activeItem.category || 'BESTSELLER').toUpperCase();
-
-    if (infoBar) {
-      infoBar.innerHTML = `
-        <h3 style="font-family:var(--font-serif); font-size:1.25rem; font-weight:700; color:var(--ink); margin-bottom:4px;">${activeItem.name}</h3>
-        <div style="font-family:var(--font-mono); font-weight:700; color:#6B3A2A; font-size:1rem; margin-bottom:8px;">₹${activeItem.price || 250}</div>
-        <button class="btn-primary" onclick="openOrderModal(); return false;" style="font-size:0.82rem; padding:8px 18px;">Order This Bestseller →</button>
-      `;
-    }
+function move3DShowcase(direction) {
+  if (direction > 0) {
+    next3DSlide();
+  } else {
+    prev3DSlide();
   }
 }
 
 function next3DSlide() {
   if (SHOWCASE_DATA.length === 0) return;
   current3DIndex = (current3DIndex + 1) % SHOWCASE_DATA.length;
-  set3DIndex(current3DIndex);
+  update3DStage();
 }
 
 function prev3DSlide() {
   if (SHOWCASE_DATA.length === 0) return;
   current3DIndex = (current3DIndex - 1 + SHOWCASE_DATA.length) % SHOWCASE_DATA.length;
-  set3DIndex(current3DIndex);
+  update3DStage();
 }
+
+function update3DStage() {
+  const total = SHOWCASE_DATA.length;
+  if (total === 0) return;
+
+  const isMobile = window.innerWidth <= 768;
+  const spacing = isMobile ? 130 : 210;
+
+  SHOWCASE_DATA.forEach((_, idx) => {
+    const el = document.getElementById(`showcase-item-${idx}`);
+    if (!el) return;
+
+    let diff = (idx - current3DIndex) % total;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+
+    el.classList.remove('pos-center', 'pos-left', 'pos-right', 'pos-hidden-left', 'pos-hidden-right');
+
+    if (diff === 0) {
+      el.classList.add('pos-center');
+      el.style.transform = `translate(-50%, -50%) scale(${isMobile ? 1.12 : 1.2}) rotateY(0deg) translateZ(0px)`;
+      el.style.zIndex = '10';
+      el.style.opacity = '1';
+      el.style.filter = 'none';
+      el.style.pointerEvents = 'auto';
+    } else if (diff === -1) {
+      el.classList.add('pos-left');
+      el.style.transform = `translate(calc(-50% - ${spacing}px), -50%) scale(0.85) rotateY(25deg) translateZ(-80px)`;
+      el.style.zIndex = '5';
+      el.style.opacity = '0.7';
+      el.style.filter = 'brightness(0.88)';
+      el.style.pointerEvents = 'auto';
+    } else if (diff === 1) {
+      el.classList.add('pos-right');
+      el.style.transform = `translate(calc(-50% + ${spacing}px), -50%) scale(0.85) rotateY(-25deg) translateZ(-80px)`;
+      el.style.zIndex = '5';
+      el.style.opacity = '0.7';
+      el.style.filter = 'brightness(0.88)';
+      el.style.pointerEvents = 'auto';
+    } else if (diff < -1) {
+      el.classList.add('pos-hidden-left');
+      el.style.transform = `translate(calc(-50% - ${spacing * 1.6}px), -50%) scale(0.65) rotateY(40deg) translateZ(-160px)`;
+      el.style.zIndex = '1';
+      el.style.opacity = '0';
+      el.style.filter = 'brightness(0.7)';
+      el.style.pointerEvents = 'none';
+    } else {
+      el.classList.add('pos-hidden-right');
+      el.style.transform = `translate(calc(-50% + ${spacing * 1.6}px), -50%) scale(0.65) rotateY(-40deg) translateZ(-160px)`;
+      el.style.zIndex = '1';
+      el.style.opacity = '0';
+      el.style.filter = 'brightness(0.7)';
+      el.style.pointerEvents = 'none';
+    }
+  });
+
+  const dots = document.querySelectorAll('.showcase-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === current3DIndex);
+  });
+
+  const activeItem = SHOWCASE_DATA[current3DIndex];
+  const infoBar = document.getElementById('showcase-info-bar');
+  if (infoBar && activeItem) {
+    infoBar.style.opacity = '0';
+    setTimeout(() => {
+      infoBar.innerHTML = `
+        <h3 class="showcase-info-title">${activeItem.name}</h3>
+        <div class="showcase-info-price">₹${activeItem.price || 250}</div>
+        ${activeItem.description || activeItem.desc ? `<p style="font-size:0.88rem; color:var(--ink-soft); max-width:440px; margin:0 auto 12px; line-height:1.4;">${activeItem.description || activeItem.desc}</p>` : ''}
+        <button class="btn-primary showcase-info-btn" onclick="openOrderModal(); return false;">
+          Order This Bestseller →
+        </button>
+      `;
+      infoBar.style.opacity = '1';
+    }, 120);
+  }
+}
+
+function startAutoSlide() {
+  stopAutoSlide();
+  autoSlideTimer = setInterval(() => {
+    next3DSlide();
+  }, 4000);
+}
+
+function stopAutoSlide() {
+  if (autoSlideTimer) {
+    clearInterval(autoSlideTimer);
+    autoSlideTimer = null;
+  }
+}
+
+function initTouchAndHoverEvents() {
+  const stage = document.querySelector('.showcase-stage-viewport');
+  if (!stage || stage.dataset.eventsInitialized) return;
+  stage.dataset.eventsInitialized = 'true';
+
+  stage.addEventListener('mouseenter', stopAutoSlide);
+  stage.addEventListener('mouseleave', startAutoSlide);
+
+  stage.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    stopAutoSlide();
+  }, { passive: true });
+
+  stage.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 40) {
+      if (diff < 0) next3DSlide();
+      else prev3DSlide();
+    }
+    startAutoSlide();
+  }, { passive: true });
+}
+
+window.addEventListener('resize', () => {
+  update3DStage();
+});
 
 // ── Menu Preview Rendering ───────────────────────────────────
 function filterMenuPreview(category, btnElement) {
