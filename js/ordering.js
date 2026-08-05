@@ -413,6 +413,7 @@ function resetTableSelectionMobile() {
 
 function updateMobileOrderFlow() {
   const isMobile = window.innerWidth <= 768;
+  const modalLeft = document.querySelector('.modal-left');
   const step1Box = document.getElementById('step-1-table-box');
   const step2Box = document.getElementById('step-2-menu-box');
   const step3Box = document.getElementById('step-3-checkout-box');
@@ -423,6 +424,7 @@ function updateMobileOrderFlow() {
 
   if (!isMobile) {
     // Desktop View: Show all sections simultaneously
+    if (modalLeft) modalLeft.style.display = 'flex';
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'block';
     if (step3Box) step3Box.style.display = 'flex';
@@ -437,6 +439,7 @@ function updateMobileOrderFlow() {
   if (mobileOrderStep === 1 || !selectedTable) {
     // Step 1: Table Selection
     mobileOrderStep = 1;
+    if (modalLeft) modalLeft.style.display = 'flex';
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'none';
     if (step3Box) step3Box.style.display = 'none';
@@ -446,6 +449,7 @@ function updateMobileOrderFlow() {
     if (stepTitle) stepTitle.textContent = 'Step 1: Pick Table';
   } else if (mobileOrderStep === 2) {
     // Step 2: Dish Selection & Search
+    if (modalLeft) modalLeft.style.display = 'flex';
     if (step1Box) step1Box.style.display = 'block';
     if (step2Box) step2Box.style.display = 'block';
     if (step3Box) step3Box.style.display = 'none';
@@ -454,7 +458,8 @@ function updateMobileOrderFlow() {
     if (backBtn) backBtn.innerHTML = '← Change Table';
     if (stepTitle) stepTitle.textContent = 'Step 2: Choose Dishes';
   } else if (mobileOrderStep === 3) {
-    // Step 3: Final Order Place & Checkout
+    // Step 3: Final Order Place & Checkout (Hide modalLeft completely to bring checkout to top)
+    if (modalLeft) modalLeft.style.display = 'none';
     if (step1Box) step1Box.style.display = 'none';
     if (step2Box) step2Box.style.display = 'none';
     if (step3Box) step3Box.style.display = 'flex';
@@ -478,7 +483,7 @@ function goToStep2Mobile() {
   mobileOrderStep = 2;
   updateMobileOrderFlow();
   const body = document.querySelector('.modal-body');
-  if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
+  if (body) body.scrollTop = 0;
 }
 
 function goToStep3Mobile() {
@@ -486,7 +491,7 @@ function goToStep3Mobile() {
   mobileOrderStep = 3;
   updateMobileOrderFlow();
   const body = document.querySelector('.modal-body');
-  if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
+  if (body) body.scrollTop = 0;
 }
 
 window.addEventListener('resize', updateMobileOrderFlow);
