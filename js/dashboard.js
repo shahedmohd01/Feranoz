@@ -58,11 +58,18 @@ function logoutOwner() {
 function revealDashboard() {
   const overlay = document.getElementById('auth-modal-overlay');
   const mainContent = document.getElementById('dashboard-main-content');
-  if (overlay) overlay.style.display = 'none';
+  if (overlay) {
+    overlay.style.display = 'none';
+    overlay.style.pointerEvents = 'none';
+  }
   if (mainContent) {
     mainContent.style.opacity = '1';
     mainContent.style.pointerEvents = 'all';
   }
+  document.documentElement.style.overflow = 'auto';
+  document.documentElement.style.overflowX = 'hidden';
+  document.body.style.overflow = 'auto';
+  document.body.style.overflowX = 'hidden';
 }
 
 // ── Web Audio Chime Sound Generator ──────────────────────────
@@ -161,12 +168,13 @@ function initLiveSync() {
 
   // Cross-device multi-device Cloud DB sync polling (every 2.5 seconds)
   syncCloudOrders();
-  setInterval(syncCloudOrders, 2500);
+  setInterval(syncCloudOrders, 1000);
 }
 
 function syncCloudOrders() {
-  fetch(FERANOZ_CLOUD_DB_URL, {
-    headers: { 'Accept': 'application/json' }
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
   })
   .then(res => res.json())
   .then(data => {
@@ -202,8 +210,9 @@ function syncCloudOrders() {
 }
 
 function syncOrderStatusToCloud(orderId, newStatus) {
-  fetch(FERANOZ_CLOUD_DB_URL, {
-    headers: { 'Accept': 'application/json' }
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
   })
   .then(res => res.json())
   .then(data => {

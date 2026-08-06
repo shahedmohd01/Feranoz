@@ -576,8 +576,9 @@ function saveOrder(order) {
 }
 
 function postOrderToCloud(order) {
-  fetch(FERANOZ_CLOUD_DB_URL, {
-    headers: { 'Accept': 'application/json' }
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
   })
   .then(res => res.json())
   .then(data => {
