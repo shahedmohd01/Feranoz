@@ -3,8 +3,6 @@ video_frames/
 anim_frames/
 scratch/
 tmp/
-website/
-dashboard/
 *.pyc
 __pycache__/
 .DS_Store

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+  <title>Feranoz Patisserie &amp; Cafe | Banjara Hills, Hyderabad</title>
+  <meta name="description"
+    content="Feranoz Patisserie &amp; Cafe — Artisan pastries, gourmet pizzas, high-protein wraps &amp; single-origin coffee in Banjara Hills, Hyderabad." />
+  <link rel="icon" href="images/logo.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Alex+Brush&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/modal.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     HEADER & NAVBAR (Liquid Glass Bar)
+     Left: Logo + Name | Middle: Home, Menu, Gallery | Right: Order Now
+════════════════════════════════════════════════════════════ -->
+  <header id="navbar" role="banner">
+    <div class="nav-inner">
+
+      <!-- LEFT: Logo Image & Brand Name (Calligraphic Script Logo Font) -->
+      <a href="#hero" class="nav-logo" aria-label="Feranoz Home">
+        <img src="images/logo.png" alt="Feranoz Logo" class="logo-img" onerror="this.style.display='none';" />
+        <span class="brand-title-font">Feranoz</span>
+      </a>
+
+      <!-- MIDDLE: Home, Menu, Gallery ONLY -->
+      <nav class="nav-links-middle" id="nav-menu" role="navigation">
+        <a href="#hero">Home</a>
+        <a href="#menu-preview">Menu</a>
+        <a href="#gallery">Gallery</a>
+      </nav>
+
+      <!-- RIGHT: Order Now Button -->
+      <div class="nav-right">
+        <button class="btn-primary" onclick="openOrderModal(); return false;" id="nav-order-btn">
+          Order Now
+        </button>
+        <button class="nav-hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     MINIMAL HERO SECTION (Scroll Reveal Animated)
+════════════════════════════════════════════════════════════ -->
+  <section id="hero" class="scroll-reveal visible" aria-label="Welcome to Feranoz">
+    <div class="container">
+      <div class="hero-grid">
+
+        <!-- Hero Text -->
+        <div class="hero-content">
+          <div class="hero-badge-pill">
+            Banjara Hills, Hyderabad
+          </div>
+
+          <h1 class="hero-title">
+            Artisan Craft,<br />
+            <span class="gold-accent">Decadent Pastries</span><br />
+            &amp; Fresh Coffee.
+          </h1>
+
+          <p class="hero-desc">
+            Hyderabad’s premier luxury patisserie. Hand-crafted Belgian chocolate cakes, authentic French butter
+            croissants &amp; single-origin coffee.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="openOrderModal()" id="hero-order-btn">
+              Place Table Order
+            </button>
+            <a href="#menu-preview" class="btn-outline">
+              Explore Menu
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Image Frame -->
+        <div class="hero-image-wrap">
+          <div class="hero-card-frame">
+            <img src="images/Insta_Saver_@feranoz_hyd_image_3932344417860612468_1080x1440_3.jpg"
+              alt="Feranoz Storefront Exterior" class="hero-card-img" />
+
+            <div class="hero-floating-badge">
+              <span class="floating-badge-tag">FRESH</span>
+              <div class="floating-badge-text">
+                <h4>Baked Daily</h4>
+                <p>Opens 12:30 PM</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     ULTRA-SMOOTH 3D BESTSELLER CAROUSEL STAGE (Scroll Reveal Animated)
+════════════════════════════════════════════════════════════ -->
+  <section id="showcase-3d-section" class="scroll-reveal"
+    style="padding: 40px 0 60px; position: relative; overflow: hidden;">
+    <div class="container">
+      <div class="section-header" style="margin-bottom: 20px;">
+        <span class="section-tag">Featured Creations</span>
+        <h2>Bestseller Items</h2>
+      </div>
+
+      <!-- 3D Viewport Stage -->
+      <div class="showcase-stage-viewport">
+        <button class="stage-arrow arrow-left" onclick="move3DShowcase(-1)" aria-label="Previous Item">‹</button>
+
+        <div class="showcase-items-track" id="showcase-items-track">
+          <!-- Rendered dynamically by main.js -->
+        </div>
+
+        <button class="stage-arrow arrow-right" onclick="move3DShowcase(1)" aria-label="Next Item">›</button>
+      </div>
+
+      <!-- Active Item Info Bar -->
+      <div class="showcase-info-bar" id="showcase-info-bar">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+
+      <!-- Pagination Dots -->
+      <div class="showcase-dots" id="showcase-dots">
+        <!-- Rendered dynamically by main.js -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     MENU PREVIEW (Scroll Reveal Animated)
+════════════════════════════════════════════════════════════ -->
+  <section id="menu-preview" class="section scroll-reveal" aria-labelledby="menu-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Menu Highlights</span>
+        <h2 id="menu-heading" class="section-title">Menu</h2>
+        <p class="section-subtitle">Real kitchen items straight from Banjara Hills</p>
+      </div>
+
+      <!-- Category Pills Nav -->
+      <div class="category-pills" id="category-pills-bar">
+        <button class="cat-pill-btn active" onclick="filterMenuPreview('all', this)">All Featured</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('desserts', this)">Desserts &amp; Pastries</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('cakes', this)">Cakes</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('pizza', this)">Gourmet Pizzas</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('appetizers', this)">Appetizers</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('burger', this)">Burgers</button>
+        <button class="cat-pill-btn" onclick="filterMenuPreview('hot-beverages', this)">Hot Beverages</button>
+      </div>
+
+      <!-- Menu Cards Grid -->
+      <div class="menu-preview-grid" id="menu-preview-grid">
+        <!-- Dynamic rendering via main.js -->
+      </div>
+
+      <div
+        style="text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <a href="menu.html" class="btn-outline">View Complete Menu</a>
+        <button class="btn-primary" onclick="openOrderModal()" id="preview-order-btn">Order Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     GALLERY SECTION (Scroll Reveal Animated)
+════════════════════════════════════════════════════════════ -->
+  <section id="gallery" class="section scroll-reveal" aria-labelledby="gallery-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Portfolio</span>
+        <h2 id="gallery-heading" class="section-title">The Feranoz Gallery</h2>
+        <p class="section-subtitle">Captured moments of our delicious creations and cozy ambiance</p>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- 1. Indoor Entrance & Staircase View -->
+        <div class="gallery-caffeine-card">
+          <img src="images/cafe_gallery/feranoz_ambiance_1.jpg" alt="Indoor Entrance & Staircase View" />
+          <div class="gallery-caffeine-overlay"><span>Indoor Entrance &amp; Staircase</span></div>
+        </div>
+        <!-- 2. Outdoor Courtyard Seating -->
+        <div class="gallery-caffeine-card">
+          <img src="images/cafe_gallery/feranoz_ambiance_2.jpg" alt="Outdoor Courtyard Seating" />
+          <div class="gallery-caffeine-overlay"><span>Outdoor Courtyard Seating</span></div>
+        </div>
+        <!-- 3. High-top Interior Table with Window View -->
+        <div class="gallery-caffeine-card">
+          <img src="images/cafe_gallery/feranoz_ambiance_3.jpg" alt="High-top Interior Table with Window View" />
+          <div class="gallery-caffeine-overlay"><span>Aesthetic Interior Views</span></div>
+        </div>
+        <!-- 4. Exterior Facade (Film Nagar Branch) -->
+        <div class="gallery-caffeine-card">
+          <img src="images/cafe_gallery/feranoz_ambiance_4.jpg" alt="Exterior Facade (Film Nagar Branch)" />
+          <div class="gallery-caffeine-overlay"><span>Exterior Facade</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     ORDER ONLINE SECTION (Swiggy & Zomato)
+═══════════════════════════════════════════════════════════ -->
+  <section id="order-online" class="section scroll-reveal" aria-labelledby="order-online-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Delivery & Pickup</span>
+        <h2 id="order-online-heading" class="section-title">Order Online</h2>
+        <p class="section-subtitle">Get Feranoz delivered to your doorstep via your favourite food app</p>
+      </div>
+
+      <div class="delivery-platforms-grid">
+
+        <!-- Swiggy -->
+        <a href="https://www.swiggy.com/city/hyderabad/feranoz-co-op-house-building-society-film-nagar-rest954695"
+           target="_blank" rel="noopener noreferrer"
+           class="delivery-platform-card swiggy-card"
+           id="swiggy-order-btn"
+           aria-label="Order on Swiggy">
+          <img src="images/swiggy_banner.png" alt="Order on Swiggy — Fast Delivery" class="delivery-platform-img" />
+          <div class="delivery-platform-overlay">
+            <span class="delivery-platform-cta">Order on Swiggy →</span>
+          </div>
+        </a>
+
+        <!-- Zomato -->
+        <a href="http://zoma.to/r/18888425"
+           target="_blank" rel="noopener noreferrer"
+           class="delivery-platform-card zomato-card"
+           id="zomato-order-btn"
+           aria-label="Order on Zomato">
+          <img src="images/zomato_banner.png" alt="Order on Zomato — Restaurant Delivery" class="delivery-platform-img" />
+          <div class="delivery-platform-overlay">
+            <span class="delivery-platform-cta">Order on Zomato →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     SIMPLE CONTACT SECTION (Scroll Reveal Animated)
+════════════════════════════════════════════════════════════ -->
+  <section id="contact" class="section scroll-reveal" aria-labelledby="contact-heading">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Location &amp; Hours</span>
+        <h2 id="contact-heading" class="section-title">Visit Feranoz Cafe</h2>
+        <p class="section-subtitle no-addr-link">Road Number 7, Banjara Hills, Hyderabad</p>
+      </div>
+
+      <div class="simple-contact-card">
+        <div class="contact-box">
+          <span class="contact-tag">ADDRESS</span>
+          <h4>Location</h4>
+          <p class="no-addr-link">8-2-542, v/8, Rd Number 7, Beside Ratnadeep supermarket, Zahara Nagar, Banjara Hills, Hyderabad 500034</p>
+        </div>
+
+        <div class="contact-box">
+          <span class="contact-tag">CONTACT</span>
+          <h4>Phone</h4>
+          <p><a href="tel:08978387668">089783 87668</a></p>
+        </div>
+
+        <div class="contact-box">
+          <span class="contact-tag">TIMINGS</span>
+          <h4>Operating Hours</h4>
+          <p>Monday – Sunday: 12:30 PM – 10:30 PM</p>
+        </div>
+
+        <div class="contact-actions-row">
+          <a href="https://maps.google.com/?q=Feranoz+Banjara+Hills+Hyderabad" target="_blank" class="btn-primary">
+            Get Directions
+          </a>
+          <a href="tel:08978387668" class="btn-outline">
+            Call Cafe
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════ -->
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-logo">
+          Feranoz Patisserie &amp; Cafe
+        </div>
+        <div class="footer-links">
+          <a href="#hero">Home</a>
+          <a href="#menu-preview">Menu</a>
+          <a href="#gallery">Gallery</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Feranoz Patisserie &amp; Cafe. All Rights Reserved. Banjara Hills, Hyderabad.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     ORDERING MODAL
+════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="order-overlay">
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <button class="modal-back-btn" id="modal-back-step-btn" aria-label="Back" onclick="handleModalBackStep()">
+          ← Back to Menu
+        </button>
+        <h3 id="modal-step-title">Feranoz Table Ordering</h3>
+        <div id="location-banner" class="checking">
+          Verifying location…
+        </div>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="modal-left">
+
+          <!-- STEP 1: TABLE SELECTION -->
+          <div id="step-1-table-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label id="step-1-label"
+                style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block;">
+                1. Select Your Table Number:
+              </label>
+              <button id="btn-change-table" onclick="resetTableSelectionMobile()" style="display:none; font-family:var(--font-mono); font-size:0.78rem; font-weight:700; color:#C9A84C; background:none; border:none; cursor:pointer; text-decoration:underline;">
+                Change Table
+              </button>
+            </div>
+            <div class="table-grid" id="table-grid"></div>
+          </div>
+
+          <!-- STEP 2: MENU LIST & SEARCH -->
+          <div id="step-2-menu-box">
+            <div style="margin-top:12px;">
+              <label
+                style="font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; font-weight:700; color:#6B5B52; display:block; margin-bottom:8px;">
+                2. Choose Items to Order:
+              </label>
+              <div class="category-tabs" id="category-tabs"></div>
+            </div>
+
+            <div style="margin-top:10px;">
+              <input type="text" id="menu-search" placeholder="Search menu items..."
+                style="width:100%; padding:10px 14px; border-radius:12px; border:1px solid #EFEAE3; font-family:inherit; font-size:0.88rem; outline:none; background:#FFFFFF;" />
+            </div>
+
+            <div class="menu-items-container" id="menu-items-container" style="margin-top:10px;"></div>
+
+            <!-- STEP 2 MOBILE BOTTOM BAR -->
+            <div id="mobile-step2-bottom-bar" class="mobile-step2-bottom-bar floating-proceed-bar">
+              <div class="mobile-cart-summary">
+                <span id="mobile-cart-items-count">0 Items</span>
+                <span id="mobile-cart-total-price">₹0</span>
+              </div>
+              <button class="btn-primary" id="btn-proceed-step3" onclick="goToStep3Mobile()" disabled style="padding:10px 18px; font-size:0.88rem; border-radius:9999px;">
+                Proceed to Order →
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- STEP 3 / RIGHT SIDE: FINAL CHECKOUT & ORDER PLACING -->
+        <div class="modal-right" id="step-3-checkout-box">
+          <div>
+            <div class="cart-title">
+              <span>Selected Cart (<span id="cart-count-badge">0</span>)</span>
+              <button onclick="clearCart()" style="font-size:0.75rem; color:#C62828; cursor:pointer; background:none; border:none;">Clear</button>
+            </div>
+
+            <div class="cart-items-list" id="cart-items-list"></div>
+
+            <div style="margin-top:14px; margin-bottom:12px;">
+              <button onclick="goToStep2Mobile()" class="btn-outline" style="width:100%; font-size:0.82rem; padding:8px 12px; border-style:dashed;">
+                + Add More Items
+              </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+              <input type="text" id="customer-name" placeholder="Your Name (Optional)"
+                style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none;" />
+
+              <input type="tel" id="customer-phone" placeholder="Mobile Number (Optional)"
+                style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none;" />
+
+              <textarea id="special-instructions" rows="2" placeholder="Special Instructions / Requests..."
+                style="width:100%; padding:8px 12px; border-radius:8px; border:1px solid #EFEAE3; font-size:0.85rem; outline:none; resize:none; font-family:inherit;"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer-box">
+            <div class="total-row">
+              <span class="total-label">Total Amount</span>
+              <span class="total-amount" id="cart-total">₹0</span>
+            </div>
+
+            <button class="btn-place-order" id="btn-place-order" onclick="placeOrder()" disabled>
+              Place Order
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="location-denied-overlay">
+    <div class="confirm-box loc-denied-box"></div>
+  </div>
+
+  <div class="modal-overlay" id="order-confirm-overlay"></div>
+
+  <!-- Scripts -->
+  <script src="js/menu-data.js"></script>
+  <script src="js/ordering.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>
