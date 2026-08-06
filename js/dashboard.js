@@ -4,7 +4,11 @@
 
 let orders = [];
 let activeFilter = 'all';
-const OWNER_PASSCODE = (typeof CAFE_CONFIG !== 'undefined' && CAFE_CONFIG.dashboardPassword) ? CAFE_CONFIG.dashboardPassword : "feranoz2024";
+let activeDateFilter = 'all'; // 'all', 'today', 'week', 'month'
+
+const OWNER_EMAIL = "shahedmohd2407@gmail.com";
+const OWNER_PASSWORD = "feranoz2024";
+const FERANOZ_CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fd6dd-bd85-7308-939d-06783229dc5f';
 
 document.addEventListener('DOMContentLoaded', () => {
   checkAuthSession();
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLiveSync();
 });
 
-// ── Passcode Protection Logic ───────────────────────────────
+// ── Email & Password Authentication Logic ───────────────────
 function checkAuthSession() {
   const isAuthed = sessionStorage.getItem('feranoz_owner_authed') === 'true';
   if (isAuthed) {
@@ -20,21 +24,30 @@ function checkAuthSession() {
   }
 }
 
-function verifyOwnerPasscode(event) {
+function verifyOwnerLogin(event) {
   if (event) event.preventDefault();
-  const inputEl = document.getElementById('owner-passcode-input');
-  const errorEl = document.getElementById('auth-error-msg');
-  if (!inputEl) return;
+  const emailInput = document.getElementById('owner-email-input');
+  const passInput  = document.getElementById('owner-pass-input');
+  const errorEl    = document.getElementById('auth-error-msg');
+  if (!emailInput || !passInput) return;
 
-  const entered = inputEl.value.trim();
-  if (entered === OWNER_PASSCODE) {
+  const enteredEmail = emailInput.value.trim().toLowerCase();
+  const enteredPass  = passInput.value.trim();
+
+  if (enteredEmail === OWNER_EMAIL.toLowerCase() && enteredPass === OWNER_PASSWORD) {
     sessionStorage.setItem('feranoz_owner_authed', 'true');
+    if (errorEl) errorEl.textContent = '';
     revealDashboard();
   } else {
-    if (errorEl) errorEl.textContent = 'Incorrect PIN, try again';
-    inputEl.value = '';
-    inputEl.focus();
+    if (errorEl) errorEl.textContent = 'Invalid Email or Password. Access Denied.';
+    passInput.value = '';
+    passInput.focus();
   }
+}
+
+function verifyOwnerPasscode(event) {
+  // Backward compatibility alias
+  verifyOwnerLogin(event);
 }
 
 function logoutOwner() {
@@ -94,7 +107,40 @@ function saveOrders() {
   renderDashboard();
 }
 
-// ── Real-Time Sync Listeners ─────────────────────────────────
+// ── Date Range Filtering Helper ──────────────────────────────
+function filterOrdersByDate(rangeVal) {
+  activeDateFilter = rangeVal || 'all';
+  renderDashboard();
+}
+
+function getFilteredOrdersByDate(orderList) {
+  if (activeDateFilter === 'all') return orderList;
+
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+
+  return orderList.filter(o => {
+    if (!o.timestamp && !o.placedAt) return true;
+    const orderDate = o.timestamp ? new Date(o.timestamp) : new Date();
+    if (isNaN(orderDate.getTime())) return true;
+
+    if (activeDateFilter === 'today') {
+      const orderDateStr = orderDate.toISOString().split('T')[0];
+      return orderDateStr === todayStr;
+    } else if (activeDateFilter === 'week') {
+      const diffMs = now.getTime() - orderDate.getTime();
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      return diffDays <= 7;
+    } else if (activeDateFilter === 'month') {
+      const diffMs = now.getTime() - orderDate.getTime();
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+      return diffDays <= 30;
+    }
+    return true;
+  });
+}
+
+// ── Real-Time Multi-Device Cloud Sync Listeners ──────────────
 function initLiveSync() {
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');
@@ -112,6 +158,70 @@ function initLiveSync() {
       loadOrders();
     }
   });
+
+  // Cross-device multi-device Cloud DB sync polling (every 2.5 seconds)
+  syncCloudOrders();
+  setInterval(syncCloudOrders, 2500);
+}
+
+function syncCloudOrders() {
+  fetch(FERANOZ_CLOUD_DB_URL, {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data || !Array.isArray(data.orders)) return;
+
+    let cloudOrders = data.orders;
+    let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
+    let hasNewOrder = false;
+
+    cloudOrders.forEach(cOrder => {
+      const existingIdx = localOrders.findIndex(l => l.id === cOrder.id);
+      if (existingIdx === -1) {
+        localOrders.unshift(cOrder);
+        hasNewOrder = true;
+      } else {
+        if (localOrders[existingIdx].status !== cOrder.status) {
+          localOrders[existingIdx].status = cOrder.status;
+        }
+      }
+    });
+
+    if (hasNewOrder) {
+      playChimeNotification();
+    }
+
+    orders = localOrders;
+    localStorage.setItem('feranoz_orders', JSON.stringify(orders));
+    renderDashboard();
+  })
+  .catch(err => {
+    // Silent catch if offline
+  });
+}
+
+function syncOrderStatusToCloud(orderId, newStatus) {
+  fetch(FERANOZ_CLOUD_DB_URL, {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    let cloudOrders = (data && Array.isArray(data.orders)) ? data.orders : [];
+    const target = cloudOrders.find(o => o.id === orderId);
+    if (target) {
+      target.status = newStatus;
+      return fetch(FERANOZ_CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ orders: cloudOrders })
+      });
+    }
+  })
+  .catch(err => console.log('Cloud status update notice:', err));
 }
 
 // ── Dashboard Rendering ───────────────────────────────────────
@@ -126,11 +236,13 @@ function updateStats() {
   const completedEl = document.getElementById('stat-completed-orders');
   const revenueEl   = document.getElementById('stat-total-revenue');
 
-  const pending = orders.filter(o => o.status === 'new' || o.status === 'preparing').length;
-  const completed = orders.filter(o => o.status === 'completed').length;
-  const revenue = orders.filter(o => o.status !== 'cancelled').reduce((sum, o) => sum + (o.total || 0), 0);
+  const dateFiltered = getFilteredOrdersByDate(orders);
 
-  if (totalEl) totalEl.textContent = orders.length;
+  const pending = dateFiltered.filter(o => o.status === 'new' || o.status === 'preparing').length;
+  const completed = dateFiltered.filter(o => o.status === 'completed').length;
+  const revenue = dateFiltered.filter(o => o.status !== 'cancelled').reduce((sum, o) => sum + (o.total || 0), 0);
+
+  if (totalEl) totalEl.textContent = dateFiltered.length;
   if (pendingEl) pendingEl.textContent = pending;
   if (completedEl) completedEl.textContent = completed;
   if (revenueEl) revenueEl.textContent = `₹${revenue}`;
@@ -142,7 +254,7 @@ function filterOrders(status, btnEl) {
     document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
     btnEl.classList.add('active');
   }
-  renderOrdersGrid();
+  renderDashboard();
 }
 
 function formatOrderDateTime(order) {
@@ -162,17 +274,20 @@ function renderOrdersGrid() {
   const countText = document.getElementById('order-count-text');
   if (!container) return;
 
-  let filtered = orders;
+  const dateFiltered = getFilteredOrdersByDate(orders);
+  let filtered = dateFiltered;
+
   if (activeFilter === 'new') {
-    filtered = orders.filter(o => o.status === 'new');
+    filtered = dateFiltered.filter(o => o.status === 'new');
   } else if (activeFilter === 'preparing') {
-    filtered = orders.filter(o => o.status === 'preparing');
+    filtered = dateFiltered.filter(o => o.status === 'preparing');
   } else if (activeFilter === 'completed') {
-    filtered = orders.filter(o => o.status === 'completed');
+    filtered = dateFiltered.filter(o => o.status === 'completed');
   }
 
   if (countText) {
-    countText.textContent = `Showing ${filtered.length} of ${orders.length} orders`;
+    const dateLabel = activeDateFilter === 'all' ? '' : ` (${activeDateFilter.toUpperCase()})`;
+    countText.textContent = `Showing ${filtered.length} of ${dateFiltered.length} orders${dateLabel}`;
   }
 
   if (filtered.length === 0) {
@@ -197,6 +312,7 @@ function renderOrdersGrid() {
         <div style="text-align:right;">
           <div style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:var(--ink);">${formatOrderDateTime(order)}</div>
           ${order.customerName ? `<div style="font-size:0.84rem; color:var(--ink-soft); font-weight:600; margin-top:2px;">Guest: ${order.customerName}</div>` : ''}
+          ${order.customerPhone ? `<div style="font-size:0.8rem; color:var(--ink-soft); font-weight:600; margin-top:1px;">📞 ${order.customerPhone}</div>` : ''}
         </div>
       </div>
 
@@ -257,6 +373,7 @@ function updateOrderStatus(orderId, newStatus) {
   if (order) {
     order.status = newStatus;
     saveOrders();
+    syncOrderStatusToCloud(orderId, newStatus);
   }
 }
 

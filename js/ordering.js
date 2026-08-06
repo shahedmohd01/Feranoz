@@ -557,10 +557,12 @@ function generateOrderId() {
   return 'FRZ-' + Date.now().toString(36).toUpperCase().slice(-5);
 }
 
+const FERANOZ_CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fd6dd-bd85-7308-939d-06783229dc5f';
+
 function saveOrder(order) {
   const existing = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
   existing.unshift(order);
-  if (existing.length > 200) existing.splice(200);
+  if (existing.length > 300) existing.splice(300);
   localStorage.setItem('feranoz_orders', JSON.stringify(existing));
 
   try {
@@ -568,6 +570,33 @@ function saveOrder(order) {
     bc.postMessage({ type: 'NEW_ORDER', order });
     bc.close();
   } catch(e) {}
+
+  // Multi-Device Cross-Device Cloud Sync to Central Owner Dashboard
+  postOrderToCloud(order);
+}
+
+function postOrderToCloud(order) {
+  fetch(FERANOZ_CLOUD_DB_URL, {
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(data => {
+    let cloudOrders = (data && Array.isArray(data.orders)) ? data.orders : [];
+    if (!cloudOrders.some(o => o.id === order.id)) {
+      cloudOrders.unshift(order);
+    }
+    return fetch(FERANOZ_CLOUD_DB_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ orders: cloudOrders })
+    });
+  })
+  .catch(err => {
+    console.log('Cloud DB Sync Notice:', err);
+  });
 }
 
 function showOrderConfirmation(order) {
