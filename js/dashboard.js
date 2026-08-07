@@ -147,66 +147,84 @@ function saveOrders() {
 }
 
 // ── Real-Time Firebase Multi-Device Order Sync Listener ───────
-function initLiveSync() {
-  const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
-  const activeDb = getDb();
+const FERANOZ_FIREBASE_ORDERS_URL = 'https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json';
 
-  // 1. Firebase Live Connection Monitor (.info/connected)
-  if (activeDb) {
-    activeDb.ref('.info/connected').on('value', (snap) => {
-      const badge = document.getElementById('firebase-status-badge');
-      const dot = document.getElementById('live-dot-icon');
-      if (snap.val() === true) {
-        if (badge) badge.textContent = 'DB CONNECTED';
-        if (dot) dot.style.background = '#2E7D32';
-      } else {
-        if (badge) badge.textContent = 'DB CONNECTING...';
-        if (dot) dot.style.background = '#D84315';
-      }
-    });
+function processIncomingOrdersData(data) {
+  if (!data) return;
 
-    // 2. Firebase Live Orders Listener (/orders)
-    activeDb.ref('orders').on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        let cloudOrders = [];
-        if (Array.isArray(data)) {
-          cloudOrders = data.filter(Boolean);
-        } else if (typeof data === 'object') {
-          cloudOrders = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-        }
-        
-        cloudOrders.sort((a, b) => {
-          const timeA = new Date(a.timestamp || a.placedAt || 0).getTime();
-          const timeB = new Date(b.timestamp || b.placedAt || 0).getTime();
-          return timeB - timeA;
-        });
-
-        let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
-        
-        let hasNew = false;
-        cloudOrders.forEach(c => {
-          if (!localOrders.some(l => l.id === c.id)) {
-            hasNew = true;
-          }
-        });
-
-        if (hasNew && localOrders.length > 0) {
-          playChimeNotification();
-        }
-
-        orders = cloudOrders;
-        localStorage.setItem('feranoz_orders', JSON.stringify(orders));
-        renderDashboard();
-      } else {
-        orders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
-        renderDashboard();
-      }
-    });
-  } else {
-    orders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
-    renderDashboard();
+  let cloudOrders = [];
+  if (Array.isArray(data)) {
+    cloudOrders = data.filter(Boolean);
+  } else if (typeof data === 'object') {
+    cloudOrders = Object.keys(data).map(key => ({ id: key, ...data[key] }));
   }
+
+  cloudOrders.sort((a, b) => {
+    const timeA = new Date(a.timestamp || a.placedAt || 0).getTime();
+    const timeB = new Date(b.timestamp || b.placedAt || 0).getTime();
+    return timeB - timeA;
+  });
+
+  let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
+  let hasNew = false;
+  
+  cloudOrders.forEach(c => {
+    if (!localOrders.some(l => l.id === c.id)) {
+      hasNew = true;
+    }
+  });
+
+  if (hasNew && localOrders.length > 0) {
+    playChimeNotification();
+  }
+
+  orders = cloudOrders;
+  localStorage.setItem('feranoz_orders', JSON.stringify(orders));
+  renderDashboard();
+}
+
+function initLiveSync() {
+  let attached = false;
+
+  const tryAttachSDK = () => {
+    const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+    if (activeDb) {
+      activeDb.ref('.info/connected').on('value', (snap) => {
+        const badge = document.getElementById('firebase-status-badge');
+        const dot = document.getElementById('live-dot-icon');
+        if (snap.val() === true) {
+          if (badge) badge.textContent = 'DB CONNECTED';
+          if (dot) dot.style.background = '#2E7D32';
+        } else {
+          if (badge) badge.textContent = 'DB CONNECTING...';
+          if (dot) dot.style.background = '#D84315';
+        }
+      });
+
+      if (!attached) {
+        attached = true;
+        activeDb.ref('orders').on('value', (snapshot) => {
+          processIncomingOrdersData(snapshot.val());
+        });
+      }
+    }
+  };
+
+  tryAttachSDK();
+  const retryInterval = setInterval(() => {
+    if (!attached) tryAttachSDK();
+    else clearInterval(retryInterval);
+  }, 500);
+
+  const fetchRestOrders = () => {
+    fetch(FERANOZ_FIREBASE_ORDERS_URL + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => processIncomingOrdersData(data))
+      .catch(e => {});
+  };
+
+  fetchRestOrders();
+  setInterval(fetchRestOrders, 2000);
 
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');
@@ -232,11 +250,16 @@ function updateOrderStatus(orderId, newStatus) {
     order.status = newStatus;
     saveOrders();
     
-    const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
-    const activeDb = getDb();
+    const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
     if (activeDb) {
-      activeDb.ref('orders').child(orderId).child('status').set(newStatus);
+      activeDb.ref('orders').child(orderId).child('status').set(newStatus).catch(e => {});
     }
+
+    fetch(`https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/orders/${orderId}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    }).catch(e => {});
   }
 }
 

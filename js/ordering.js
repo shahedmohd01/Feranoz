@@ -565,12 +565,16 @@ function saveOrder(order) {
   if (existing.length > 300) existing.splice(300);
   localStorage.setItem('feranoz_orders', JSON.stringify(existing));
 
-  // Firebase Realtime Database Order Submission (/orders)
-  if (typeof db !== 'undefined' && db) {
-    db.ref('orders').child(order.id).set(order).catch(err => {
-      console.log('Firebase Order Push Notice:', err);
-    });
+  const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  if (activeDb) {
+    activeDb.ref('orders').child(order.id).set(order).catch(err => {});
   }
+
+  fetch(`https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/orders/${order.id}.json`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order)
+  }).catch(err => {});
 
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');

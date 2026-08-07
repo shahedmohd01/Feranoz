@@ -1237,15 +1237,21 @@ function getActiveMenuData() {
 
 
 // ── Firebase Realtime Database Menu Price & Item Sync ────────
+const FERANOZ_FIREBASE_MENU_URL = 'https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/menu.json';
+
 function saveActiveMenuData(updatedMenu) {
   localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
   
   const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
   if (activeDb) {
-    activeDb.ref('menu').set(updatedMenu).catch(err => {
-      console.log('Firebase Menu Write Notice:', err);
-    });
+    activeDb.ref('menu').set(updatedMenu).catch(err => {});
   }
+
+  fetch(FERANOZ_FIREBASE_MENU_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatedMenu)
+  }).catch(err => {});
 
   try {
     const bc = new BroadcastChannel('feranoz_menu_channel');
@@ -1253,44 +1259,64 @@ function saveActiveMenuData(updatedMenu) {
   } catch(e) {}
 }
 
-function initFirebaseMenuListener() {
-  const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
-  const activeDb = getDb();
+function processIncomingMenuData(data) {
+  let updatedMenu = null;
 
-  if (activeDb) {
-    activeDb.ref('menu').on('value', (snapshot) => {
-      const data = snapshot.val();
-      let updatedMenu = null;
-
-      if (data) {
-        if (Array.isArray(data) && data.length > 0) {
-          updatedMenu = data;
-        } else if (typeof data === 'object' && Object.keys(data).length > 0) {
-          updatedMenu = Object.values(data);
-        }
-      }
-
-      if (updatedMenu && updatedMenu.length > 0) {
-        localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
-      } else if (typeof MENU_DATA !== 'undefined' && Array.isArray(MENU_DATA) && MENU_DATA.length > 0) {
-        // Fallback & auto-seed if Firebase /menu node is empty
-        const initial = MENU_DATA.map(item => ({ ...item, available: item.available !== false }));
-        localStorage.setItem('feranoz_custom_menu', JSON.stringify(initial));
-        activeDb.ref('menu').set(initial).catch(e => {});
-      }
-
-      try {
-        window.dispatchEvent(new Event('storage'));
-      } catch(e) {}
-
-      if (typeof renderMenuPreview === 'function') renderMenuPreview();
-      if (typeof init3DShowcase === 'function') init3DShowcase();
-      if (typeof renderMenuItems === 'function') renderMenuItems('all');
-      if (typeof renderCart === 'function') renderCart();
-      if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
-    });
+  if (data) {
+    if (Array.isArray(data) && data.length > 0) {
+      updatedMenu = data.filter(Boolean);
+    } else if (typeof data === 'object' && Object.keys(data).length > 0) {
+      updatedMenu = Object.values(data).filter(Boolean);
+    }
   }
+
+  if (updatedMenu && updatedMenu.length > 0) {
+    localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
+  } else if (typeof MENU_DATA !== 'undefined' && Array.isArray(MENU_DATA) && MENU_DATA.length > 0) {
+    const initial = MENU_DATA.map(item => ({ ...item, available: item.available !== false }));
+    localStorage.setItem('feranoz_custom_menu', JSON.stringify(initial));
+    saveActiveMenuData(initial);
+  }
+
+  try {
+    window.dispatchEvent(new Event('storage'));
+  } catch(e) {}
+
+  if (typeof renderMenuPreview === 'function') renderMenuPreview();
+  if (typeof init3DShowcase === 'function') init3DShowcase();
+  if (typeof renderMenuItems === 'function') renderMenuItems('all');
+  if (typeof renderCart === 'function') renderCart();
+  if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
 }
 
-// Attach live Firebase /menu listener
+function initFirebaseMenuListener() {
+  let attached = false;
+
+  const tryAttachSDK = () => {
+    const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+    if (activeDb && !attached) {
+      attached = true;
+      activeDb.ref('menu').on('value', (snapshot) => {
+        processIncomingMenuData(snapshot.val());
+      });
+    }
+  };
+
+  tryAttachSDK();
+  const retryInterval = setInterval(() => {
+    if (!attached) tryAttachSDK();
+    else clearInterval(retryInterval);
+  }, 500);
+
+  const fetchRestMenu = () => {
+    fetch(FERANOZ_FIREBASE_MENU_URL + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => processIncomingMenuData(data))
+      .catch(e => {});
+  };
+
+  fetchRestMenu();
+  setInterval(fetchRestMenu, 2000);
+}
+
 initFirebaseMenuListener();
