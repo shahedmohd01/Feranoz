@@ -682,6 +682,133 @@
     var db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
     window.db = db;
   </script>
+  <!-- Live Failproof Firebase Sync Engine -->
+  <script>
+    (function() {
+      const FERANOZ_FIREBASE_ORDERS_URL = 'https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/orders.json';
+      const FERANOZ_FIREBASE_MENU_URL   = 'https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/menu.json';
+
+      window.processIncomingMenuData = function(data) {
+        let updatedMenu = null;
+        if (data) {
+          if (Array.isArray(data) && data.length > 0) {
+            updatedMenu = data.filter(Boolean);
+          } else if (typeof data === 'object' && Object.keys(data).length > 0) {
+            updatedMenu = Object.values(data).filter(Boolean);
+          }
+        }
+
+        if (updatedMenu && updatedMenu.length > 0) {
+          localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
+        } else if (typeof MENU_DATA !== 'undefined' && Array.isArray(MENU_DATA) && MENU_DATA.length > 0) {
+          const initial = MENU_DATA.map(item => ({ ...item, available: item.available !== false }));
+          localStorage.setItem('feranoz_custom_menu', JSON.stringify(initial));
+          if (typeof saveActiveMenuData === 'function') saveActiveMenuData(initial);
+        }
+
+        try { window.dispatchEvent(new Event('storage')); } catch(e) {}
+        if (typeof renderMenuPreview === 'function') renderMenuPreview();
+        if (typeof init3DShowcase === 'function') init3DShowcase();
+        if (typeof renderMenuItems === 'function') renderMenuItems('all');
+        if (typeof renderCart === 'function') renderCart();
+        if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
+      };
+
+      window.processIncomingOrdersData = function(data) {
+        if (!data) return;
+        let cloudOrders = [];
+        if (Array.isArray(data)) {
+          cloudOrders = data.filter(Boolean);
+        } else if (typeof data === 'object') {
+          cloudOrders = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        }
+
+        cloudOrders.sort((a, b) => {
+          const timeA = new Date(a.timestamp || a.placedAt || 0).getTime();
+          const timeB = new Date(b.timestamp || b.placedAt || 0).getTime();
+          return timeB - timeA;
+        });
+
+        let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
+        let hasNew = false;
+        cloudOrders.forEach(c => {
+          if (!localOrders.some(l => l.id === c.id)) {
+            hasNew = true;
+          }
+        });
+
+        if (hasNew && localOrders.length > 0 && typeof playChimeNotification === 'function') {
+          playChimeNotification();
+        }
+
+        if (typeof orders !== 'undefined') {
+          orders = cloudOrders;
+        }
+        localStorage.setItem('feranoz_orders', JSON.stringify(cloudOrders));
+        if (typeof renderDashboard === 'function') renderDashboard();
+      };
+
+      window.initFailproofListeners = function() {
+        let attached = false;
+        const tryAttachSDK = () => {
+          const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+          if (activeDb) {
+            try {
+              activeDb.ref('.info/connected').on('value', (snap) => {
+                const badge = document.getElementById('firebase-status-badge');
+                const dot = document.getElementById('live-dot-icon');
+                if (snap.val() === true) {
+                  if (badge) badge.textContent = 'DB CONNECTED';
+                  if (dot) dot.style.background = '#2E7D32';
+                } else {
+                  if (badge) badge.textContent = 'DB CONNECTING...';
+                  if (dot) dot.style.background = '#D84315';
+                }
+              });
+            } catch(e){}
+
+            if (!attached) {
+              attached = true;
+              try {
+                activeDb.ref('menu').on('value', snap => window.processIncomingMenuData(snap.val()));
+              } catch(e){}
+              try {
+                activeDb.ref('orders').on('value', snap => window.processIncomingOrdersData(snap.val()));
+              } catch(e){}
+            }
+          }
+        };
+
+        tryAttachSDK();
+        const retryTimer = setInterval(() => {
+          if (!attached) tryAttachSDK();
+          else clearInterval(retryTimer);
+        }, 500);
+
+        // Fail-safe HTTP REST API Polling every 2s
+        const fetchRestData = () => {
+          fetch(FERANOZ_FIREBASE_MENU_URL + '?t=' + Date.now(), { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => window.processIncomingMenuData(data))
+            .catch(e => {});
+
+          fetch(FERANOZ_FIREBASE_ORDERS_URL + '?t=' + Date.now(), { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => window.processIncomingOrdersData(data))
+            .catch(e => {});
+        };
+
+        fetchRestData();
+        setInterval(fetchRestData, 2000);
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', window.initFailproofListeners);
+      } else {
+        window.initFailproofListeners();
+      }
+    })();
+  </script>
 </head>
 
 <body>
@@ -1067,8 +1194,8 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/menu-data.js?v=2.0"></script>
-  <script src="js/dashboard.js?v=2.0"></script>
+  <script src="js/menu-data.js?v=3.5"></script>
+  <script src="js/dashboard.js?v=3.5"></script>
 </body>
 
 </html>
