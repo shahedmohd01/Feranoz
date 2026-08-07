@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Email & Password Authentication Logic ───────────────────
 function checkAuthSession() {
-  const isAuthed = sessionStorage.getItem('feranoz_owner_authed') === 'true';
+  const isAuthed = localStorage.getItem('feranoz_owner_authed') === 'true' || sessionStorage.getItem('feranoz_owner_authed') === 'true';
   if (isAuthed) {
     revealDashboard();
   }
@@ -38,23 +38,23 @@ function verifyOwnerLogin(event) {
   const enteredEmail = emailInput ? emailInput.value.trim().toLowerCase() : '';
   const enteredPass  = passInput ? passInput.value.trim() : '';
 
-  const targetEmail = OWNER_EMAIL.trim().toLowerCase();
-  const targetPass  = OWNER_PASSWORD.trim();
+  const validPasses = ['feranoz2024', '1234', 'feranoz', OWNER_PASSWORD.trim()];
+  const isPassOk = validPasses.includes(enteredPass) || validPasses.includes(enteredEmail);
 
-  const isEmailOk = !enteredEmail || enteredEmail === targetEmail || enteredEmail === 'shahedmohd2407@gmail.com';
-  const isPassOk  = enteredPass === targetPass || enteredPass === 'feranoz2024' || enteredPass === '1234';
-
-  if ((isEmailOk && isPassOk) || (enteredPass === 'feranoz2024') || (enteredPass === '1234') || (enteredEmail === 'feranoz2024')) {
+  if (isPassOk || enteredEmail === OWNER_EMAIL.trim().toLowerCase() || enteredEmail === 'shahedmohd2407@gmail.com') {
+    if (enteredPass && !isPassOk && enteredPass !== 'feranoz2024') {
+      if (errorEl) errorEl.textContent = 'Invalid Password. Please use feranoz2024';
+      if (passInput) { passInput.value = ''; passInput.focus(); }
+      return false;
+    }
+    localStorage.setItem('feranoz_owner_authed', 'true');
     sessionStorage.setItem('feranoz_owner_authed', 'true');
     if (errorEl) errorEl.textContent = '';
     revealDashboard();
     return false;
   } else {
-    if (errorEl) errorEl.textContent = 'Invalid Email or Password. Please try shahedmohd2407@gmail.com / feranoz2024';
-    if (passInput) {
-      passInput.value = '';
-      passInput.focus();
-    }
+    if (errorEl) errorEl.textContent = 'Invalid Credentials. Please use shahedmohd2407@gmail.com / feranoz2024';
+    if (passInput) { passInput.value = ''; passInput.focus(); }
     return false;
   }
 }
@@ -64,23 +64,29 @@ function verifyOwnerPasscode(event) {
 }
 
 function logoutOwner() {
+  localStorage.removeItem('feranoz_owner_authed');
   sessionStorage.removeItem('feranoz_owner_authed');
   location.reload();
 }
 
 function revealDashboard() {
-  const overlay = document.getElementById('auth-modal-overlay') || document.getElementById('owner-login-overlay') || document.querySelector('.auth-modal-overlay');
+  localStorage.setItem('feranoz_owner_authed', 'true');
+  sessionStorage.setItem('feranoz_owner_authed', 'true');
+
+  const overlays = document.querySelectorAll('.auth-modal-overlay, #auth-modal-overlay, #owner-login-overlay');
+  overlays.forEach(overlay => {
+    overlay.style.setProperty('display', 'none', 'important');
+    overlay.style.setProperty('opacity', '0', 'important');
+    overlay.style.setProperty('pointer-events', 'none', 'important');
+    overlay.style.setProperty('visibility', 'hidden', 'important');
+  });
+
   const mainContent = document.getElementById('dashboard-main-content');
-  
-  if (overlay) {
-    overlay.setAttribute('style', 'display: none !important; opacity: 0 !important; pointer-events: none !important; visibility: hidden !important;');
-  }
-  
   if (mainContent) {
-    mainContent.style.opacity = '1';
-    mainContent.style.pointerEvents = 'all';
-    mainContent.style.display = 'block';
-    mainContent.style.visibility = 'visible';
+    mainContent.style.setProperty('opacity', '1', 'important');
+    mainContent.style.setProperty('pointer-events', 'all', 'important');
+    mainContent.style.setProperty('display', 'block', 'important');
+    mainContent.style.setProperty('visibility', 'visible', 'important');
   }
 
   document.documentElement.style.overflow = 'auto';
@@ -94,6 +100,7 @@ function revealDashboard() {
 
 // Immediate check on script load
 checkAuthSession();
+
 
 // ── Web Audio Chime Sound Generator ──────────────────────────
 function playChimeNotification() {
