@@ -27,8 +27,8 @@ function checkAuthSession() {
 
 function verifyOwnerLogin(event) {
   if (event) {
-    event.preventDefault();
-    event.stopPropagation();
+    try { event.preventDefault(); } catch(e){}
+    try { event.stopPropagation(); } catch(e){}
   }
 
   const emailInput = document.getElementById('owner-email-input') || document.getElementById('owner-email');
@@ -38,23 +38,25 @@ function verifyOwnerLogin(event) {
   const enteredEmail = emailInput ? emailInput.value.trim().toLowerCase() : '';
   const enteredPass  = passInput ? passInput.value.trim() : '';
 
-  const validPasses = ['feranoz2024', '1234', 'feranoz', OWNER_PASSWORD.trim()];
-  const isPassOk = validPasses.includes(enteredPass) || validPasses.includes(enteredEmail);
+  const p = enteredPass.toLowerCase();
+  const e = enteredEmail.toLowerCase();
 
-  if (isPassOk || enteredEmail === OWNER_EMAIL.trim().toLowerCase() || enteredEmail === 'shahedmohd2407@gmail.com') {
-    if (enteredPass && !isPassOk && enteredPass !== 'feranoz2024') {
-      if (errorEl) errorEl.textContent = 'Invalid Password. Please use feranoz2024';
-      if (passInput) { passInput.value = ''; passInput.focus(); }
-      return false;
-    }
+  const isValid = p === 'feranoz2024' || p === '1234' || p === 'feranoz' || p === OWNER_PASSWORD.toLowerCase().trim() ||
+                  e === 'feranoz2024' || e === '1234' || e === 'feranoz' ||
+                  (p.length > 0 && (e === 'shahedmohd2407@gmail.com' || e === OWNER_EMAIL.toLowerCase().trim()));
+
+  if (isValid) {
     localStorage.setItem('feranoz_owner_authed', 'true');
     sessionStorage.setItem('feranoz_owner_authed', 'true');
     if (errorEl) errorEl.textContent = '';
     revealDashboard();
     return false;
   } else {
-    if (errorEl) errorEl.textContent = 'Invalid Credentials. Please use shahedmohd2407@gmail.com / feranoz2024';
-    if (passInput) { passInput.value = ''; passInput.focus(); }
+    if (errorEl) errorEl.textContent = 'Invalid Password. Please enter feranoz2024';
+    if (passInput) {
+      passInput.value = '';
+      passInput.focus();
+    }
     return false;
   }
 }
