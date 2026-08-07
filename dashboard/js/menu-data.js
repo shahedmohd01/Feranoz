@@ -1254,24 +1254,40 @@ function saveActiveMenuData(updatedMenu) {
 }
 
 function initFirebaseMenuListener() {
-  const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  const activeDb = getDb();
+
   if (activeDb) {
     activeDb.ref('menu').on('value', (snapshot) => {
       const data = snapshot.val();
+      let updatedMenu = null;
+
       if (data) {
-        const updatedMenu = Array.isArray(data) ? data : Object.values(data);
-        localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
-
-        try {
-          window.dispatchEvent(new Event('storage'));
-        } catch(e) {}
-
-        if (typeof renderMenuPreview === 'function') renderMenuPreview();
-        if (typeof init3DShowcase === 'function') init3DShowcase();
-        if (typeof renderMenuItems === 'function') renderMenuItems('all');
-        if (typeof renderCart === 'function') renderCart();
-        if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
+        if (Array.isArray(data) && data.length > 0) {
+          updatedMenu = data;
+        } else if (typeof data === 'object' && Object.keys(data).length > 0) {
+          updatedMenu = Object.values(data);
+        }
       }
+
+      if (updatedMenu && updatedMenu.length > 0) {
+        localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
+      } else if (typeof MENU_DATA !== 'undefined' && Array.isArray(MENU_DATA) && MENU_DATA.length > 0) {
+        // Fallback & auto-seed if Firebase /menu node is empty
+        const initial = MENU_DATA.map(item => ({ ...item, available: item.available !== false }));
+        localStorage.setItem('feranoz_custom_menu', JSON.stringify(initial));
+        activeDb.ref('menu').set(initial).catch(e => {});
+      }
+
+      try {
+        window.dispatchEvent(new Event('storage'));
+      } catch(e) {}
+
+      if (typeof renderMenuPreview === 'function') renderMenuPreview();
+      if (typeof init3DShowcase === 'function') init3DShowcase();
+      if (typeof renderMenuItems === 'function') renderMenuItems('all');
+      if (typeof renderCart === 'function') renderCart();
+      if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
     });
   }
 }
