@@ -147,7 +147,6 @@ function saveOrders() {
 }
 
 // ── Real-Time Dual-Sync & Firebase Connection Monitor ───────
-const FERANOZ_CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fd6dd-bd85-7308-939d-06783229dc5f';
 
 function initLiveSync() {
   const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
