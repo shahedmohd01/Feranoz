@@ -20,6 +20,24 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/modal.css" />
+  <!-- Firebase App & Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAfGGF1VMxk9sv5xTstEIc1sozTuxsbXCI",
+      authDomain: "feranoz-cafe.firebaseapp.com",
+      databaseURL: "https://feranoz-cafe-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "feranoz-cafe",
+      storageBucket: "feranoz-cafe.firebasestorage.app",
+      messagingSenderId: "945928099178",
+      appId: "1:945928099178:web:b6bd48da202f3a61138113"
+    };
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
+  </script>
 </head>
 
 <body>

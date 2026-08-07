@@ -565,14 +565,18 @@ function saveOrder(order) {
   if (existing.length > 300) existing.splice(300);
   localStorage.setItem('feranoz_orders', JSON.stringify(existing));
 
+  // Firebase Realtime Database Order Submission (/orders)
+  if (typeof db !== 'undefined' && db) {
+    db.ref('orders').child(order.id).set(order).catch(err => {
+      console.log('Firebase Order Push Notice:', err);
+    });
+  }
+
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');
     bc.postMessage({ type: 'NEW_ORDER', order });
     bc.close();
   } catch(e) {}
-
-  // Multi-Device Cross-Device Cloud Sync to Central Owner Dashboard
-  postOrderToCloud(order);
 }
 
 function postOrderToCloud(order) {

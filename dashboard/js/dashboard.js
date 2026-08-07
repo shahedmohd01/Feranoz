@@ -38,8 +38,8 @@ function verifyOwnerLogin(event) {
   const enteredEmail = emailInput ? emailInput.value.trim().toLowerCase() : '';
   const enteredPass  = passInput ? passInput.value.trim() : '';
 
-  const targetEmail = OWNER_EMAIL.toLowerCase();
-  const targetPass  = OWNER_PASSWORD;
+  const targetEmail = OWNER_EMAIL.trim().toLowerCase();
+  const targetPass  = OWNER_PASSWORD.trim();
 
   const isEmailOk = !enteredEmail || enteredEmail === targetEmail || enteredEmail === 'shahedmohd2407@gmail.com';
   const isPassOk  = enteredPass === targetPass || enteredPass === 'feranoz2024' || enteredPass === '1234';
@@ -50,7 +50,7 @@ function verifyOwnerLogin(event) {
     revealDashboard();
     return false;
   } else {
-    if (errorEl) errorEl.textContent = 'Invalid Email or Password. Please use shahedmohd2407@gmail.com / feranoz2024';
+    if (errorEl) errorEl.textContent = 'Invalid Email or Password. Please try shahedmohd2407@gmail.com / feranoz2024';
     if (passInput) {
       passInput.value = '';
       passInput.focus();
@@ -69,14 +69,11 @@ function logoutOwner() {
 }
 
 function revealDashboard() {
-  const overlay = document.getElementById('auth-modal-overlay');
+  const overlay = document.getElementById('auth-modal-overlay') || document.getElementById('owner-login-overlay') || document.querySelector('.auth-modal-overlay');
   const mainContent = document.getElementById('dashboard-main-content');
   
   if (overlay) {
-    overlay.style.display = 'none';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.opacity = '0';
-    overlay.style.visibility = 'hidden';
+    overlay.setAttribute('style', 'display: none !important; opacity: 0 !important; pointer-events: none !important; visibility: hidden !important;');
   }
   
   if (mainContent) {
@@ -97,7 +94,6 @@ function revealDashboard() {
 
 // Immediate check on script load
 checkAuthSession();
-
 
 // ── Web Audio Chime Sound Generator ──────────────────────────
 function playChimeNotification() {
@@ -141,41 +137,33 @@ function saveOrders() {
   renderDashboard();
 }
 
-// ── Date Range Filtering Helper ──────────────────────────────
-function filterOrdersByDate(rangeVal) {
-  activeDateFilter = rangeVal || 'all';
-  renderDashboard();
-}
-
-function getFilteredOrdersByDate(orderList) {
-  if (activeDateFilter === 'all') return orderList;
-
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-
-  return orderList.filter(o => {
-    if (!o.timestamp && !o.placedAt) return true;
-    const orderDate = o.timestamp ? new Date(o.timestamp) : new Date();
-    if (isNaN(orderDate.getTime())) return true;
-
-    if (activeDateFilter === 'today') {
-      const orderDateStr = orderDate.toISOString().split('T')[0];
-      return orderDateStr === todayStr;
-    } else if (activeDateFilter === 'week') {
-      const diffMs = now.getTime() - orderDate.getTime();
-      const diffDays = diffMs / (1000 * 60 * 60 * 24);
-      return diffDays <= 7;
-    } else if (activeDateFilter === 'month') {
-      const diffMs = now.getTime() - orderDate.getTime();
-      const diffDays = diffMs / (1000 * 60 * 60 * 24);
-      return diffDays <= 30;
-    }
-    return true;
-  });
-}
-
-// ── Real-Time Multi-Device Cloud Sync Listeners ──────────────
+// ── Real-Time Firebase Multi-Device Order Sync Listener ───────
 function initLiveSync() {
+  if (typeof db !== 'undefined' && db) {
+    db.ref('orders').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const cloudOrders = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
+        let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
+        
+        let hasNew = false;
+        cloudOrders.forEach(c => {
+          if (!localOrders.some(l => l.id === c.id)) {
+            hasNew = true;
+          }
+        });
+
+        if (hasNew && localOrders.length > 0) {
+          playChimeNotification();
+        }
+
+        orders = cloudOrders;
+        localStorage.setItem('feranoz_orders', JSON.stringify(orders));
+        renderDashboard();
+      }
+    });
+  }
+
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');
     bc.onmessage = (event) => {
@@ -192,73 +180,19 @@ function initLiveSync() {
       loadOrders();
     }
   });
-
-  // Cross-device multi-device Cloud DB sync polling (every 2.5 seconds)
-  syncCloudOrders();
-  setInterval(syncCloudOrders, 1000);
 }
 
-function syncCloudOrders() {
-  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
-    headers: { 'Accept': 'application/json' },
-    cache: 'no-store'
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (!data || !Array.isArray(data.orders)) return;
-
-    let cloudOrders = data.orders;
-    let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
-    let hasNewOrder = false;
-
-    cloudOrders.forEach(cOrder => {
-      const existingIdx = localOrders.findIndex(l => l.id === cOrder.id);
-      if (existingIdx === -1) {
-        localOrders.unshift(cOrder);
-        hasNewOrder = true;
-      } else {
-        if (localOrders[existingIdx].status !== cOrder.status) {
-          localOrders[existingIdx].status = cOrder.status;
-        }
-      }
-    });
-
-    if (hasNewOrder) {
-      playChimeNotification();
+function updateOrderStatus(orderId, newStatus) {
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    order.status = newStatus;
+    saveOrders();
+    if (typeof db !== 'undefined' && db) {
+      db.ref('orders').child(orderId).child('status').set(newStatus);
     }
-
-    orders = localOrders;
-    localStorage.setItem('feranoz_orders', JSON.stringify(orders));
-    renderDashboard();
-  })
-  .catch(err => {
-    // Silent catch if offline
-  });
+  }
 }
 
-function syncOrderStatusToCloud(orderId, newStatus) {
-  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
-    headers: { 'Accept': 'application/json' },
-    cache: 'no-store'
-  })
-  .then(res => res.json())
-  .then(data => {
-    let cloudOrders = (data && Array.isArray(data.orders)) ? data.orders : [];
-    const target = cloudOrders.find(o => o.id === orderId);
-    if (target) {
-      target.status = newStatus;
-      return fetch(FERANOZ_CLOUD_DB_URL, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ orders: cloudOrders })
-      });
-    }
-  })
-  .catch(err => console.log('Cloud status update notice:', err));
-}
 
 // ── Dashboard Rendering ───────────────────────────────────────
 function renderDashboard() {
@@ -267,10 +201,10 @@ function renderDashboard() {
 }
 
 function updateStats() {
-  const totalEl     = document.getElementById('stat-total-orders');
-  const pendingEl   = document.getElementById('stat-pending-orders');
+  const totalEl = document.getElementById('stat-total-orders');
+  const pendingEl = document.getElementById('stat-pending-orders');
   const completedEl = document.getElementById('stat-completed-orders');
-  const revenueEl   = document.getElementById('stat-total-revenue');
+  const revenueEl = document.getElementById('stat-total-revenue');
 
   const dateFiltered = getFilteredOrdersByDate(orders);
 
@@ -746,11 +680,11 @@ function submitNewMenuItem(event) {
   if (event) event.preventDefault();
 
   const nameEl = document.getElementById('new-item-name');
-  const catEl  = document.getElementById('new-item-category');
+  const catEl = document.getElementById('new-item-category');
   const priceEl = document.getElementById('new-item-price');
   const isVegEl = document.getElementById('new-item-isveg');
-  const descEl  = document.getElementById('new-item-desc');
-  const fileEl  = document.getElementById('new-item-image-file');
+  const descEl = document.getElementById('new-item-desc');
+  const fileEl = document.getElementById('new-item-image-file');
 
   if (!nameEl || !priceEl) return;
 
@@ -787,7 +721,7 @@ function submitNewMenuItem(event) {
 
   if (fileEl && fileEl.files && fileEl.files[0]) {
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       commitNewItem(e.target.result);
     };
     reader.readAsDataURL(fileEl.files[0]);
@@ -802,15 +736,15 @@ function openEditItemModal(itemId) {
   const item = allItems.find(i => i.id === itemId);
   if (!item) return;
 
-  const idEl      = document.getElementById('edit-item-id');
-  const nameEl    = document.getElementById('edit-item-name');
-  const catEl     = document.getElementById('edit-item-category');
-  const priceEl   = document.getElementById('edit-item-price');
-  const isVegEl   = document.getElementById('edit-item-isveg');
-  const popEl     = document.getElementById('edit-item-popular');
-  const availEl   = document.getElementById('edit-item-available');
-  const descEl    = document.getElementById('edit-item-desc');
-  const fileEl    = document.getElementById('edit-item-image-file');
+  const idEl = document.getElementById('edit-item-id');
+  const nameEl = document.getElementById('edit-item-name');
+  const catEl = document.getElementById('edit-item-category');
+  const priceEl = document.getElementById('edit-item-price');
+  const isVegEl = document.getElementById('edit-item-isveg');
+  const popEl = document.getElementById('edit-item-popular');
+  const availEl = document.getElementById('edit-item-available');
+  const descEl = document.getElementById('edit-item-desc');
+  const fileEl = document.getElementById('edit-item-image-file');
 
   if (idEl) idEl.value = item.id;
   if (nameEl) nameEl.value = item.name;
@@ -834,15 +768,15 @@ function closeEditItemModal() {
 function submitEditMenuItem(event) {
   if (event) event.preventDefault();
 
-  const idEl      = document.getElementById('edit-item-id');
-  const nameEl    = document.getElementById('edit-item-name');
-  const catEl     = document.getElementById('edit-item-category');
-  const priceEl   = document.getElementById('edit-item-price');
-  const isVegEl   = document.getElementById('edit-item-isveg');
-  const popEl     = document.getElementById('edit-item-popular');
-  const availEl   = document.getElementById('edit-item-available');
-  const descEl    = document.getElementById('edit-item-desc');
-  const fileEl    = document.getElementById('edit-item-image-file');
+  const idEl = document.getElementById('edit-item-id');
+  const nameEl = document.getElementById('edit-item-name');
+  const catEl = document.getElementById('edit-item-category');
+  const priceEl = document.getElementById('edit-item-price');
+  const isVegEl = document.getElementById('edit-item-isveg');
+  const popEl = document.getElementById('edit-item-popular');
+  const availEl = document.getElementById('edit-item-available');
+  const descEl = document.getElementById('edit-item-desc');
+  const fileEl = document.getElementById('edit-item-image-file');
 
   if (!idEl || !idEl.value) return;
 
@@ -869,7 +803,7 @@ function submitEditMenuItem(event) {
 
   if (fileEl && fileEl.files && fileEl.files[0]) {
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       commitEdit(e.target.result);
     };
     reader.readAsDataURL(fileEl.files[0]);
