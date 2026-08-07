@@ -1240,8 +1240,9 @@ function getActiveMenuData() {
 function saveActiveMenuData(updatedMenu) {
   localStorage.setItem('feranoz_custom_menu', JSON.stringify(updatedMenu));
   
-  if (typeof db !== 'undefined' && db) {
-    db.ref('menu').set(updatedMenu).catch(err => {
+  const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  if (activeDb) {
+    activeDb.ref('menu').set(updatedMenu).catch(err => {
       console.log('Firebase Menu Write Notice:', err);
     });
   }
@@ -1253,8 +1254,9 @@ function saveActiveMenuData(updatedMenu) {
 }
 
 function initFirebaseMenuListener() {
-  if (typeof db !== 'undefined' && db) {
-    db.ref('menu').on('value', (snapshot) => {
+  const activeDb = (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  if (activeDb) {
+    activeDb.ref('menu').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const updatedMenu = Array.isArray(data) ? data : Object.values(data);

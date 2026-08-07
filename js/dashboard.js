@@ -137,10 +137,29 @@ function saveOrders() {
   renderDashboard();
 }
 
-// ── Real-Time Firebase Multi-Device Order Sync Listener ───────
+// ── Real-Time Dual-Sync & Firebase Connection Monitor ───────
+const FERANOZ_CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fd6dd-bd85-7308-939d-06783229dc5f';
+
 function initLiveSync() {
-  if (typeof db !== 'undefined' && db) {
-    db.ref('orders').on('value', (snapshot) => {
+  const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
+  const activeDb = getDb();
+
+  // 1. Firebase Live Connection Monitor (.info/connected)
+  if (activeDb) {
+    activeDb.ref('.info/connected').on('value', (snap) => {
+      const badge = document.getElementById('firebase-status-badge');
+      const dot = document.getElementById('live-dot-icon');
+      if (snap.val() === true) {
+        if (badge) badge.textContent = 'DB CONNECTED';
+        if (dot) dot.style.background = '#2E7D32';
+      } else {
+        if (badge) badge.textContent = 'DB CONNECTING...';
+        if (dot) dot.style.background = '#D84315';
+      }
+    });
+
+    // 2. Firebase Live Orders Listener
+    activeDb.ref('orders').on('value', (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const cloudOrders = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
@@ -164,6 +183,10 @@ function initLiveSync() {
     });
   }
 
+  // 3. Fail-Safe Hybrid Cloud DB Polling (JsonBlob Backup every 1.5s)
+  syncCloudOrders();
+  setInterval(syncCloudOrders, 1500);
+
   try {
     const bc = new BroadcastChannel('feranoz_orders_channel');
     bc.onmessage = (event) => {
@@ -182,15 +205,83 @@ function initLiveSync() {
   });
 }
 
+function syncCloudOrders() {
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data || !Array.isArray(data.orders)) return;
+
+    let cloudOrders = data.orders;
+    let localOrders = JSON.parse(localStorage.getItem('feranoz_orders') || '[]');
+    let hasNewOrder = false;
+
+    cloudOrders.forEach(cOrder => {
+      const existingIdx = localOrders.findIndex(l => l.id === cOrder.id);
+      if (existingIdx === -1) {
+        localOrders.unshift(cOrder);
+        hasNewOrder = true;
+      } else {
+        if (localOrders[existingIdx].status !== cOrder.status) {
+          localOrders[existingIdx].status = cOrder.status;
+        }
+      }
+    });
+
+    if (hasNewOrder && orders.length > 0) {
+      playChimeNotification();
+    }
+
+    orders = localOrders;
+    localStorage.setItem('feranoz_orders', JSON.stringify(orders));
+    renderDashboard();
+  })
+  .catch(err => {
+    // Silent catch
+  });
+}
+
 function updateOrderStatus(orderId, newStatus) {
   const order = orders.find(o => o.id === orderId);
   if (order) {
     order.status = newStatus;
     saveOrders();
-    if (typeof db !== 'undefined' && db) {
-      db.ref('orders').child(orderId).child('status').set(newStatus);
+    
+    const getDb = () => (typeof db !== 'undefined' && db) ? db : (window.db || null);
+    const activeDb = getDb();
+    if (activeDb) {
+      activeDb.ref('orders').child(orderId).child('status').set(newStatus);
     }
+
+    // Sync to JsonBlob Cloud DB
+    syncOrderStatusToCloud(orderId, newStatus);
   }
+}
+
+function syncOrderStatusToCloud(orderId, newStatus) {
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
+  })
+  .then(res => res.json())
+  .then(data => {
+    let cloudOrders = (data && Array.isArray(data.orders)) ? data.orders : [];
+    const target = cloudOrders.find(o => o.id === orderId);
+    if (target) {
+      target.status = newStatus;
+      return fetch(FERANOZ_CLOUD_DB_URL, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ orders: cloudOrders, modifiedMenu: data.modifiedMenu || {} })
+      });
+    }
+  })
+  .catch(err => console.log('Cloud status update notice:', err));
 }
 
 

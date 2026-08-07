@@ -663,7 +663,7 @@
       }
     }
   </style>
-  <!-- Firebase App & Realtime Database SDKs -->
+    <!-- Firebase App & Realtime Database SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
@@ -679,7 +679,8 @@
     if (typeof firebase !== 'undefined' && !firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
+    var db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
+    window.db = db;
   </script>
 </head>
 
@@ -737,7 +738,7 @@
       <div class="nav-right" style="display:flex; align-items:center; gap:8px;">
         <span
           style="font-family:var(--font-mono); font-size:0.8rem; font-weight:700; color:#2E7D32; display:flex; align-items:center;">
-          <span class="live-dot"></span> LIVE SYNC
+          <span class="live-dot" id="live-dot-icon"></span> <span id="firebase-status-badge">DB CONNECTED</span>
         </span>
 
         <button class="nav-hamburger" id="owner-hamburger" aria-label="Toggle owner navigation"

@@ -20,7 +20,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/modal.css" />
-  <!-- Firebase App & Realtime Database SDKs -->
+    <!-- Firebase App & Realtime Database SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
@@ -36,7 +36,8 @@
     if (typeof firebase !== 'undefined' && !firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
+    var db = (typeof firebase !== 'undefined' && firebase.apps.length) ? firebase.database() : null;
+    window.db = db;
   </script>
 </head>
 
