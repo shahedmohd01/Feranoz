@@ -630,8 +630,8 @@ function renderOwnerMenuManagement() {
         <!-- CONTROLS ROW: STATIC PRICE, AVAILABILITY TOGGLE, EDIT & DELETE -->
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFEAE3; padding-top:8px; gap:6px; flex-wrap:wrap;">
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <div style="font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#6B3A2A;">
-              ₹${item.price}
+            <div style="display:flex; align-items:center; gap:2px; font-family:var(--font-mono); font-size:0.9rem; font-weight:700; color:#6B3A2A;">
+              ₹<input type="number" value="${item.price}" min="1" onchange="updateItemPrice(${item.id}, this.value)" title="Click or type to instantly change price" style="width:68px; font-family:var(--font-mono); font-weight:700; font-size:0.88rem; color:#6B3A2A; border:1px solid #E5DFD6; border-radius:6px; padding:2px 6px; background:#FAF7F2; outline:none;" />
             </div>
             ${item.popular ? `<span style="font-family:var(--font-mono); font-size:0.62rem; font-weight:700; background:#FFF8E1; color:#D84315; border:1px solid #FFE0B2; padding:2px 8px; border-radius:9999px; letter-spacing:0.04em;">⭐ BESTSELLER</span>` : ''}
           </div>

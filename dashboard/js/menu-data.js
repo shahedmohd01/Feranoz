@@ -1232,16 +1232,118 @@ function getActiveMenuData() {
   return initial;
 }
 
+
+
+// ── Real-Time Multi-Website Menu Cloud Sync ───────────────────
+const FERANOZ_CLOUD_DB_URL = 'https://jsonblob.com/api/jsonBlob/019fd6dd-bd85-7308-939d-06783229dc5f';
+
 function saveActiveMenuData(dataList) {
   localStorage.setItem('feranoz_custom_menu', JSON.stringify(dataList));
+  
+  const modifiedMenu = {};
+  dataList.forEach(item => {
+    const baseItem = typeof MENU_DATA !== 'undefined' ? MENU_DATA.find(b => b.id === item.id) : null;
+    if (!baseItem) {
+      modifiedMenu[item.id] = item;
+    } else {
+      const diff = {};
+      if (item.price !== baseItem.price) diff.price = item.price;
+      if (item.available !== baseItem.available) diff.available = item.available;
+      if (item.popular !== baseItem.popular) diff.popular = item.popular;
+      if (item.name !== baseItem.name) diff.name = item.name;
+      if (item.isVeg !== baseItem.isVeg) diff.isVeg = item.isVeg;
+      if (item.description !== baseItem.description) diff.description = item.description;
+      if (item.image && item.image !== baseItem.image) diff.image = item.image;
+
+      if (Object.keys(diff).length > 0) {
+        diff.id = item.id;
+        modifiedMenu[item.id] = diff;
+      }
+    }
+  });
+
+  postMenuToCloud(modifiedMenu);
+
   try {
     const bc = new BroadcastChannel('feranoz_menu_channel');
     bc.postMessage({ type: 'MENU_UPDATED' });
   } catch(e) {}
 }
 
-function getMenuCategories() {
-  const data = getActiveMenuData();
-  const catSet = new Set(data.map(i => i.category));
-  return CATEGORIES.filter(c => c.id === 'all' || catSet.has(c.id));
+function postMenuToCloud(modifiedMenu) {
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
+  })
+  .then(res => res.json())
+  .then(data => {
+    let currentOrders = (data && Array.isArray(data.orders)) ? data.orders : [];
+    let currentMenu   = (data && typeof data.modifiedMenu === 'object' && data.modifiedMenu) ? data.modifiedMenu : {};
+    
+    const mergedMenu = { ...currentMenu, ...modifiedMenu };
+
+    return fetch(FERANOZ_CLOUD_DB_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ orders: currentOrders, modifiedMenu: mergedMenu })
+    });
+  })
+  .catch(err => {
+    console.log('Cloud Menu Sync Notice:', err);
+  });
 }
+
+function syncCloudMenuData() {
+  fetch(FERANOZ_CLOUD_DB_URL + '?t=' + Date.now(), {
+    headers: { 'Accept': 'application/json' },
+    cache: 'no-store'
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data || typeof data.modifiedMenu !== 'object' || !data.modifiedMenu) return;
+
+    let localMenu = getActiveMenuData();
+    let updated = false;
+
+    for (const [key, override] of Object.entries(data.modifiedMenu)) {
+      const itemId = override.id || (isNaN(key) ? key : parseInt(key, 10));
+      let target = localMenu.find(i => String(i.id) === String(itemId));
+
+      if (target) {
+        for (const [prop, val] of Object.entries(override)) {
+          if (target[prop] !== val) {
+            target[prop] = val;
+            updated = true;
+          }
+        }
+      } else {
+        localMenu.unshift(override);
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      localStorage.setItem('feranoz_custom_menu', JSON.stringify(localMenu));
+      
+      try {
+        window.dispatchEvent(new Event('storage'));
+      } catch(e) {}
+
+      if (typeof renderMenuPreview === 'function') renderMenuPreview();
+      if (typeof init3DShowcase === 'function') init3DShowcase();
+      if (typeof renderMenuItems === 'function') renderMenuItems('all');
+      if (typeof renderCart === 'function') renderCart();
+      if (typeof renderOwnerMenuManagement === 'function') renderOwnerMenuManagement();
+    }
+  })
+  .catch(err => {
+    // Silent catch
+  });
+}
+
+// Poll cloud menu sync every 1.5s across customer website and owner dashboard
+syncCloudMenuData();
+setInterval(syncCloudMenuData, 1500);
